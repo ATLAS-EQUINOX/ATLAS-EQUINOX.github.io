@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> ΛTLΛS | ΞQUINOX™ </title>
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Custom Styles -->
+  <link href="./styles.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+  <div id="loadingOverlay">
+    <div class="loading-content">
+      <output class="spinner-border text-info mb-3" name="warpStatus"></output>
+      <div class="nav-logo"><strong>ΛTLΛS | ΞQUINOX™</strong><br><small>An Interstellar Trading Company</small> </div>
+    </div>
+  </div>
+
+  <nav class="top-nav d-flex justify-content-between align-items-center p-2">
+    <div class="d-flex align-items-center gap-3">
+      <img src="./images/white.png" alt="ATLAS Logo" id="logoImage" style="height: 60px;" />
+      <div class="nav-logo">
+        <strong>ΛTLΛS | ΞQUINOX™</strong><br>
+        <small>An Interstellar Trading Company</small>
+      </div>
+    </div>
+  
+    <div class="nav-links">
+      <button id="openAboutBtn"><i class="fa fa-book"></i> | About ΛΞ</button>
+      <button id="openLeaderboardBtn"><i class="fa fa-trophy"></i> | Sector Corporate Leaderboard</button>
+      <button onclick="saveGameState(logToConsole = true)"><i class="fa fa-save"></i> | Save</button>
+      <button onclick="resetGameState()"><i class="fa fa-trash-o"></i> | Reset Save</button>
+    </div>
+  </nav>
+  
+
+
+
+  <!-- Warp Overlay -->
+  <div id="warp-overlay" class="warp-overlay d-none">
+    <div class="warp-content text-center">
+      <output class="spinner-border text-info mb-3" name="warpStatus"></output>
+      <h3>WARP IN PROGRESS...</h3>
+      <p id="warp-route" class="small text-light mb-1">Sol to Alpha Centauri (Step X of Y)</p>
+
+      <!-- 🟡 Progress Bar -->
+      <div class="progress mt-2" style="height: 20px;">
+        <div id="warp-progress-bar" class="progress-bar bg-warning progress-bar-striped progress-bar-animated"
+          role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          0%
+        </div>
+      </div>
+      <button id="abortWarpBtn" class="btn btn-warning mt-3">
+        ✖ | Abort Warp
+      </button>
+    </div>
+  </div>
+
+
+
+  <!-- Enhanced Leaderboard Modal -->
+  <div id="leaderboardModal" class="modal">
+    <div class="modal-content">
+      <span id="closeLeaderboardBtn" class="close">&times;</span>
+      <h2></i>Leaderboard</h2>
+      <div class="leaderboard-scroll-container">
+        <table id="leaderboardTable" class="table table-dark table-striped">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Corporation:</th>
+              <th>Net Worth (Credits + Stock):</th>
+              <th>Credits:</th>
+              <th>Stock Value:</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="WelcomeModal" class="modal" style="display: none;">
+    <div class="modal-content large-modal">
+      <div id="WelcomeContent">
+        <h3>ΛTLΛS | ΞQUINOX™</h3>
+        <p>
+          Welcome to ΛΞ, Intern-324234231.
+        </p>
+        <p>
+          You are a disposable yet vital cog in ΛΞ’s ever-churning interstellar profit engine. As part of your
+          mandatory-voluntary
+          contract, you will source volatile resources, authorize ethically interpretive trades, and exploit market
+          collapses
+          across economically impoverished systems.
+        </p>
+        <p></p>
+
+        <p>
+          To get you started, ΛΞ have generously provided you with <strong><span class="text-success">100ᶜ</span></strong> - Please note any and all profits generated from this starting credit are legally, spiritually, and metaphysically the property of ΛTLΛS | ΞQUINOX™. In return, you may
+          earn radiation sickness capsules and hydration credits (<span class="text-warning"><i>*pending managerial approval - which may be reasonably withheld</i></span>).
+        <p>
+          Every resource is a
+          unit. Every decision is a liability. Every failure is documented, analyzed, repackaged, and sold as a
+          consultancy insight.
+        </p>
+        </p>
+        <span id="closeWelcomeBtn" class="close">&times;</span>
+        <hr>
+
+        <p class="text-muted small">
+          <span class="text-danger"><i>By using this terminal, you agree to the ΛTLΛS | ΞQUINOX™ End-User License
+              Agreement
+              (pages.413-3405, p.654 SC.435.5.A) which you definitely read, understood, and internalized
+              spiritually.</i></span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- About Modal -->
+  <div id="aboutModal" class="modal" style="display: none;">
+    <div class="modal-content large-modal">
+      <div id="aboutContent">
+        <h3>ΛTLΛS | ΞQUINOX™</h3>
+        <p>
+          Born in the fiscal black hole of late-stage capitalism, ΛTLΛS | ΞQUINOX™ was formed from the hostile merger of
+          two economic behemoths:
+          ΛTLΛS Logistics, the galaxy’s most aggressive supply chain megacorp (specializing in efficiency and moral
+          flexibility),
+          and ΞQUINOX Holdings, a shadowy megafund known for asset acquisition, time manipulation, and occasionally
+          purchasing entire quadrants.
+        </p>
+        <p>
+          The merger baffled regulators, terrified investors, and incidentally destabilized the three moons of
+          Tai-Ceti-5.
+        </p>
+        The result? A single hypercapitalist juggernaut whose quarterly profits outpace some galactic GDPs and whose
+        market brokers (like you Intern-324234231!) are mostly still unpaid interns.
+        </p>
+        <span id="closeAboutBtn" class="close">&times;</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Main Layout -->
+  <div class="main-layout d-flex flex-row">
+
+    <!-- Sidebar Section -->
+    <aside class="sidebar p-3">
+
+      <section class="console-wrapper2 mb-3">
+        <small>
+          <b>Credits:</b> <span id="credits">~</span>ᶜ<br>
+          <b>Fuel:</b> <span id="fuel">~</span>ᵣ / 500ᵣ<br>
+
+          <b>Inventory:</b> <span  id="inventoryCount">~</span>ᵣ</text><br>
+         <b>ΛΞ Vault:</b> <span  id="vaultCount">~</span>ᵣ</text><br>
+
+        </small>
+      </section>
+
+
+
+      <section class="console-wrapper2 mb-3 overflow: hidden;">
+
+        <small><label class="form-label"><text class="highlight">Current System: </text><span id="location"
+              class="resource-name">Sol</span></label></small>
+        <select id="travelSearch" class="form-select mb-2">
+        </select>
+        <button id="travelButton" class="btn btn-outline-warning w-100" onclick="travel()">Warp</button>
+        <button id="refuelButton" class="btn btn-outline-warning w-100 mb-3" onclick="refuel()">Refuel</button>
+      </section>
+
+
+      <section class="console-wrapper2 mb-3">
+        <small><label class="form-label"><text class="highlight">Buy Resource: </text></label></small>
+        <select id="buyResourceSelect" class="form-select mb-2"></select>
+        <input type="number" id="buyAmount" maxlength="3" min="1" class="form-control mb-2" value="5"
+          placeholder="Amount" />
+        <button class="btn btn-success w-100" onclick="buyMaterial()">Buy</button>
+      </section>
+
+      <!-- Sell Box -->
+      <section class="console-wrapper2 mb-3">
+        <small><label class="form-label"><text class="highlight">Sell Resource: </text></label></small>
+        <select id="sellResourceSelect" class="form-select mb-2"></select>
+        <input type="number" id="sellAmount" maxlength="3" min="1" class="form-control mb-2" value="5"
+          placeholder="Amount" />
+        <button class="btn btn-danger w-100" onclick="sellMaterial()">Sell</button>
+      </section>
+
+
+      <text id="tradeStats" class="trade-stats greyed-out">Trade Counter: <span id="tradeCount">0</span></text>
+      <div id="saveStatus" class="greyed-out">Last Save: ~</div>
+
+
+
+
+
+    </aside>
+
+    <!-- Main Content Section -->
+
+    <main class="main-and-console flex-grow-1 p-3">
+      <section class="console-wrapper23 mb-3">
+
+        <div class="market-wrapper d-flex flex-column flex-grow-1">
+
+          <!-- Market Overview Header -->
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">Market Overview:</h5>
+
+
+
+
+            <div id="viewModeButtons">
+              <button id="openTariffBtn" class="btn btn-outline-secondary">View Tax Rates</button>
+
+
+
+              <button id="toggleMarketView" class="btn btn-outline-secondary"><i class="fa fa-toggle-on"
+                  aria-hidden="true"></i>
+                | Show Only Current System</button>
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+
+          <!-- Market Tables -->
+          <div id="market-container" class="flex-grow-1">
+
+            <table id="marketHeadingTable" class="table table-dark table-sm text-center"></table>
+            <table id="spreadTable" class="table table-dark table-sm text-center"></table>
+
+            <div id="market-scroll-wrapper">
+              <table id="marketTable" class="table table-dark table-sm text-center market-main-table"></table>
+            </div>
+
+          </div>
+
+          <div style="margin-top: 0.85rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+            <div>
+              <text style="color: #ffc107;">⭓</text>
+              <span class="text-muted small">| System specializes in this resource, often resulting in better pricing or supply.</span>
+            </div>
+            <div>
+              <span style="color: #ffffff;"class="glitch-effect" data-text="">∅</span>
+              <span class="text-muted small">| Market data degrades over distance, expect corrupted or uncertain data from some systems.</span>
+            </div>
+          </div>
+          
+
+       
+
+      </section>
+
+
+      <div class="log-row d-flex gap-3 mt-2">
+        <div class="console-wrapper2 flex-fill log-box-container">
+          <h5>ΛΞ Terminal:</h5>
+          <div id="console" class="log-box"></div>
+        </div>
+
+        <div class="console-wrapper2 flex-fill log-box-container">
+          <h5>Market Activity:</h5>
+          <div id="marketLog" class="log-box"></div>
+        </div>
+      </div>
+
+    </main>
+
+    <aside class="inventory-panel p-3">
+      <!-- Tab Navigation -->
+      <ul class="nav nav-tabs" id="logisticsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="logistics-tab" data-bs-toggle="tab" data-bs-target="#logistics"
+            type="button" role="tab">Logistics</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="contracts-tab" data-bs-toggle="tab" data-bs-target="#contracts" type="button"
+            role="tab">Contracts</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link disabled" id="Investments-tab" data-bs-toggle="tab" data-bs-target="#Investments"
+            type="button" role="tab" disabled>Investments</button>
+        </li>
+        
+
+      </ul>
+
+      <!-- Tab Content -->
+      <div class="tab-content" id="logisticsTabContent">
+        <!-- Logistics Tab -->
+        <div class="tab-pane fade show active" id="logistics" role="tabpanel">
+          <section class="console-wrapper flex-fill">
+            <h5 id="shipmentsTitle">Incoming Shipments:</h5>
+            <ul id="shipments" class="shipment-list list-unstyled small"></ul>
+          </section>
+          <br>
+          <section class="console-wrapper flex-fill">
+            <h5>Inventory: <span class="expandable" onclick="togglePanel('sidebarInventoryContent')">▲▼ | Open</span>
+            </h5>
+            <div id="sidebarInventoryContent" class="sidebar-inventory">
+              <div id="inventoryItemsContainer"></div>
+              <button id="sellAllButton" class="btn btn-danger w-100" onclick="sellAllMaterials()">Sell
+                Inventory</button>
+            </div>
+          </section>
+          <br>
+          <section class="console-wrapper flex-fill">
+            <h5>ΛΞ's Vault: <span class="expandable" onclick="togglePanel('vaultInventoryContent')">▲▼ | Open</span>
+            </h5>
+            <div id="vaultInventoryContent" class="sidebar-inventory" style="display: block;"></div>
+          </section>
+        </div>
+
+        <!-- Contracts Tab -->
+        <div class="tab-pane fade" id="contracts" role="tabpanel">
+          <section class="console-wrapper flex-fill">
+            <h6>Active Contracts:</h6>
+            <div id="activeContractsContainer" class="d-flex flex-column gap-2 mb-3"></div>
+          </section>
+
+          <section class="console-wrapper flex-fill">
+            <h6>Available Contracts:</h6>
+            <div id="contractsContainer" class="d-flex flex-column gap-2"></div>
+          </section>
+        </div>
+
+
+        <div class="tab-pane fade" id="Investments" role="tabpanel">
+          <section class="console-wrapper flex-fill">
+        </div>
+
+
+      </div>
+    </aside>
+  </div>
+
+
+  <div id="tariffModal" class="modal" style="display: none;">
+    <div class="modal-content tariff-scroll-modal">
+      <span id="closeTariffBtn" class="close">&times;</span>
+      <h2></i>Tax Rates</h2>
+      <table class="table table-sm table-dark table-bordered">
+        <thead>
+          <tr>
+            <th>System</th>
+            <th>Buy</th>
+            <th>Sell</th>
+          </tr>
+        </thead>
+        <tbody id="tariffTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="warpModal" class="modal2warp">
+    <div class="modal-content galactic-style width:400px">
+      <span class="close" onclick="closeWarpModal()">&times;</span>
+      <h4>Route Confirmation</h4>
+
+      <div class="warp-route-text">
+        <h4>
+          <p><strong></strong> <span id="warpRouteDisplay"></span></p>
+        </h4>
+        <p><strong>Path:</strong> <span id="warpFullPath"></span></p>
+        <p><strong>Jumps:</strong> <span id="warpHopCount"></span></p>
+        <p><strong>~Fuel Consumption: </strong> <span id="warpFuelEstimate"></span>ᵣ</p>
+      </div>
+      <hr>
+
+      <!-- Confirm + Cancel inside modal -->
+      <button id="confirmWarpBtn" class="btn btn-success w-100">Initiate Warp Sequence</button>
+      <button id="cancelWarpBtn" class="btn btn-danger w-100" onclick="cancelWarp()">Cancel Warp</button>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+
+
+  <script src="./js/main.js" defer></script>
+  <script src="./js/trade_contracts.js" defer></script>
+
+  <link rel="shortcut icon" href="images/Fav.png">
+  <!--<div> Icons made by <a href="https://www.flaticon.com/authors/artifex" title="Artifex"> Artifex 
+  </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>-->
+
+
+</body>
+
+</html>

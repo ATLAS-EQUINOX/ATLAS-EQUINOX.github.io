@@ -1,0 +1,1754 @@
+/* =============================================================
+   === BASE STYLES ===
+   ============================================================= */
+
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #1a1a1b;
+  color: #ffffff;
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =============================================================
+             === LAYOUT ===
+             ============================================================= */
+
+.main-layout {
+  display: grid;
+  grid-template-columns: auto 1fr 300px;
+  height: 100vh;
+  /* ensure it fills the whole viewport */
+  overflow: hidden;
+}
+
+.main-and-console {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.supply-demand-info {
+  font-size: 0.65em;
+  color: #aaa;
+  margin-top: 4px;
+  line-height: 1.2;
+}
+
+.supply-demand-info strong {
+  color: #ccc;
+}
+
+#market-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#market-scroll-wrapper {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  border-top: 1px solid #444;
+  border-bottom: 1px solid #444;
+
+}
+
+#marketHeadingTable th {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 6px 8px;
+  color: #ffffff;
+  /* or your preferred header text color */
+  text-align: center;
+}
+
+#spreadTable th {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 6px 8px;
+  text-align: center;
+}
+
+#marketHeadingTable, #spreadTable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+#market-container th, #market-container td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0px;
+  font-size: 0.85rem;
+}
+
+.market-table-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: 100%;
+  border: 1px solid #333;
+  border-radius: 6px;
+}
+
+#marketTable {
+  table-layout: fixed;
+  /* Allow columns to auto size based on content */
+  width: 100%;
+  /* Prevent full-width stretching */
+}
+
+#marketTable th, #marketTable td {
+  padding: 0.5rem 0.4rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  /* Prevent text from wrapping */
+}
+
+#marketTable th:first-child, #marketTable td:first-child {
+  white-space: normal;
+  word-break: break-word;
+  max-width: 100px;
+  /* Optional: limit width to force wrapping */
+}
+
+/* =============================================================
+             === HEADER ===
+             ============================================================= */
+
+.market-section {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.market-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+.modal {
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #1e1e1e;
+  margin: 5% auto;
+  padding: 24px 32px;
+  border: 1px solid #333;
+  width: 90%;
+  max-width: 1200px;
+  border-radius: 12px;
+  color: #fff;
+  position: relative;
+  overflow: auto;
+}
+
+.modal2warp {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;  /* full screen */
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex; /* use flex to center content */
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* make sure it's on top */
+}
+
+.modal2warp .modal-content {
+  background-color: #111;
+  padding: 20px;
+  border-radius: 8px;
+  width: 50%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.specialized-cell {
+  position: relative;
+}
+
+#logoImage {
+  height: 800px;
+  width: auto;
+}
+
+.specialized-cell::after {
+  content: "⭓"; /* You can change this to any symbol or emoji */
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.5em;
+  color: #ffc107; /* golden sparkle */
+  pointer-events: none;
+}
+
+
+.close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  color: #aaa;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.sidebar-inventory {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 0.5rem;
+
+  font-size: 0.9em;
+  color: #ddd;
+}
+
+.sidebar-inventory .resource-group {
+  background-color: #111;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #ffc107;
+  box-shadow: 0 0 4px #00000088;
+}
+
+.sidebar-inventory .resource-group2 {
+  background-color: #111;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #299486;
+  box-shadow: 0 0 4px #00000088;
+}
+
+button {
+  font-family: inherit;
+  /* or a specific font like 'Orbitron', 'monospace', etc. */
+}
+
+
+
+.sell-batch-btn {
+  background: #991f1f00;
+  color: #fff;
+  font-size: 0.75em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.move-batch-btn {
+  background: #991f1f00;
+  color: #fff;
+  font-size: 0.75em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.move-batch-btn2 {
+  background: #991f1f00;
+  color: #fff;
+  font-size: 0.75em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+
+.sidebar-inventory .resource-name {
+  font-size: 1.05em;
+  text-shadow: 0 0 3px #000;
+  margin-bottom: 6px;
+}
+
+.sidebar-inventory .batch-line {
+  font-size: 0.9em;
+  padding: 2px 0;
+  margin: 0 4px;
+  display: flex;
+  justify-content: space-between;
+  color: #ccc;
+}
+
+#sidebarInventoryContent {
+  max-height: 450px;
+  /* adjust this value to fit your layout */
+  /* or whatever height fits your layout */
+  overflow-y: auto;
+  padding-right: 5px;
+  /* optional: prevents horizontal scroll bar */
+}
+
+.sidebar-inventory .market-value-line {
+  margin-top: 6px;
+  margin-bottom: -4px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  font-weight: bold;
+  color: rgb(255, 255, 255);
+  border-top: 1px dashed #444;
+  padding-top: 3px;
+}
+
+.sidebar-inventory .inventory-total {
+  font-size: 0.95em;
+  text-align: right;
+  color: #ccc;
+}
+
+section.console-wrapper h5 span.text-success {
+  margin-left: 8px;
+  font-weight: normal;
+}
+
+/* =============================================================
+             === PANELS ===
+             ============================================================= */
+
+.sidebar {
+  background-color: #1a1a1b;
+  padding: 1.25rem;
+  border-left: 1px solid #2d2d2e;
+  border-right: 1px solid #2d2d2e;
+  overflow-y: auto;
+  min-width: 220px;
+  max-width: 320px;
+}
+
+.inventory-panel {
+  background-color: #1a1a1b;
+  padding: 1.25rem;
+  border-left: 1px solid #2d2d2e;
+  border-right: 1px solid #2d2d2e;
+  overflow-y: auto;
+  min-width: 400px;
+}
+
+.sidebar {
+  min-width: 220px;
+  max-width: 320px;
+  width: auto;
+}
+
+.inventory-resource h5 {
+  margin-bottom: 0;
+}
+
+.inventory-resource div {
+  margin: 0;
+  line-height: 1.3;
+  margin-top: 1px;
+}
+
+/* =============================================================
+             === BUTTONS ===
+             ============================================================= */
+
+.btn-group .btn {
+  transition: all 0.2s ease;
+  border: 1px solid #444;
+}
+
+
+
+.btn-group .btn:not(.active):hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #ffffff;
+  color: #fff;
+}
+
+.btn-group .btn.active:hover {
+  background-color: #000;
+  border-color: #000;
+}
+
+/* =============================================================
+             === TYPOGRAPHY ===
+             ============================================================= */
+
+h4, h5, h6 {
+  color: #fff;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 4px #ffffff55;
+}
+
+.form-label, .small, label, .text-info {
+  color: #ffffff !important;
+}
+
+.highlight, .system-label {
+  color: #fff;
+  font-weight: bold;
+}
+
+/* =============================================================
+             === FORM CONTROLS ===
+             ============================================================= */
+
+select, input, button {
+  margin-bottom: 0.5rem;
+  background-color: #0d0d0d;
+  color: #f0f0f0;
+  border: 1px solid #444;
+}
+
+select:focus, input:focus {
+  border-color: #fff;
+  box-shadow: 0 0 0 0.1rem #0e0e0e88;
+}
+
+/* =============================================================
+             === TABLES ===
+             ============================================================= */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #111;
+  color: #f5f5f5;
+  font-size: 0.95rem;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+thead th:first-child {
+  border-top-left-radius: 8px;
+}
+
+thead th:last-child {
+  border-top-right-radius: 8px;
+}
+
+th, td {
+  padding: 0.75rem 0.6rem;
+  text-align: center;
+  border: 1px solid #333;
+  cursor: pointer;
+  user-select: none;
+}
+
+.price-cell {
+  position: relative;
+  padding-right: 1.5em;
+}
+
+.trend-indicator {
+  font-size: 0.7em;
+  opacity: 0.6;
+  position: absolute;
+  top: 1px;
+  right: 4px;
+  pointer-events: none;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+th {
+  background: linear-gradient(to right, #1e1e1e, #2a2a2a);
+  font-weight: 600;
+  text-shadow: 0 0 4px #00ffff44;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+th:hover {
+  text-decoration: underline;
+}
+
+.high-price {
+  background-color: #14532d;
+  color: #b6fcb6;
+  font-weight: bold;
+  position: relative;
+  box-shadow: inset 0 0 6px #1aff1a66;
+}
+
+.low-price {
+  background-color: #641616;
+  color: #ffb3b3;
+  font-weight: bold;
+  position: relative;
+  box-shadow: inset 0 0 6px #ff444466;
+}
+
+.high-price::after {
+  position: absolute;
+  top: 1px;
+  right: 4px;
+  font-size: 0.65em;
+  opacity: 0.85;
+  color: #80ff80;
+}
+
+.low-price::after {
+  position: absolute;
+  top: 1px;
+  right: 4px;
+  font-size: 0.65em;
+  opacity: 0.85;
+  color: #ff9999;
+}
+
+.fuel-col {
+  background-color: #1b1b1b;
+  color: #fff;
+  font-weight: bold;
+  border-left: 1px solid #fff;
+}
+
+/* =============================================================
+             === CONSOLE ===
+             ============================================================= */
+
+.console-wrapper {
+  background-color: #1a1a1b;
+  border: 1px solid #2d2d2e;
+  border-radius: 8px;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 0;
+  margin-top: 0 !important;
+  padding-top: 0.5rem;
+  /* just enough breathing room */
+}
+
+.console {
+  background-color: #111;
+  color: #fff;
+
+  font-size: 0.85rem;
+  padding: 12px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  max-height: 90px;
+  overflow-y: auto;
+  overflow-y: auto;
+}
+
+.console-entry {
+  margin-bottom: 4px;
+}
+
+.log-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.console-timestamp {
+  color: #888;
+  margin-right: 6px;
+}
+
+/* =============================================================
+             === WARP OVERLAY ===
+             ============================================================= */
+
+.warp-overlay {
+  position: fixed;
+  inset: 0;
+  will-change: transform, opacity;
+  background: rgba(5, 15, 25, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: 'Arial', sans-serif;
+  color: #fff;
+  text-align: center;
+  z-index: 9999;
+}
+
+.warp-overlay .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.warp-overlay.d-none {
+  display: none;
+}
+
+#viewModeButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* =============================================================
+             === SHIPMENTS ===
+             ============================================================= */
+
+.shipment-panel {
+  background-color: #1a1a1b;
+  color: #ccc;
+  padding: 10px;
+  border: 1px solid #555;
+  border-radius: 8px;
+}
+
+#loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: black;
+  color: white;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Orbitron", sans-serif;
+  transition: opacity 0.5s ease-out;
+}
+
+#loadingOverlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.shipment-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  background-color: #222;
+  border-left: 5px solid #464646;
+  border-radius: 4px;
+}
+
+.shipment-list .eta {
+  color: #ffffff;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =============================================================
+             === MISC ===
+             ============================================================= */
+
+.loading-content h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 6px #00ffffaa;
+}
+
+.lowest-price-cell {
+  background-color: #dc3545 !important; /* deep green */
+  color: #420e13;
+  font-weight: bold;
+  box-shadow: 0 0 6px #dc3545;
+}
+
+
+
+.highest-price-cell {
+  background-color: rgb(0, 255, 106) !important; /* deep red */
+  color: rgb(13, 88, 44);
+  font-weight: bold;
+  box-shadow: 0 0 6px rgb(0, 255, 106);
+}
+
+
+.nav-link.disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+
+
+
+th.highest-spread {
+  color: rgb(0, 255, 106) !important;
+  /* Dark text */
+}
+
+#spreadTable th:hover {
+  text-decoration: none !important;
+}
+
+.custom-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #111;
+  /* matches dark theme */
+  border: 1px solid #444;
+  border-top: none;
+}
+
+.unavailable-cell {
+  background-color: #111111;
+  font-weight: bold;
+  color: #000000;
+}
+
+#shipments li {
+  background-color: #111111;
+}
+
+.dropdown-wrapper {
+  position: relative;
+  margin-bottom: 2.5rem;
+  /* ensures space below the dropdown */
+}
+
+.current-system-row td:first-child {
+  color: #ffc107;
+  font-weight: bold;
+  position: relative; /* Needed for absolute positioning of ::after */
+}
+
+.current-system-row td:first-child::after {
+  content: "◤"; /* Symbol to display */
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 0.82em;
+  color: #ffc107; /* Golden sparkle */
+  pointer-events: none;
+}
+
+
+.greyed-out {
+  color: #666;
+}
+
+.resource-group {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+  min-width: 200px;
+}
+
+.resource-name {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 6px;
+  color: #ffc107;
+  text-shadow: 0 0 2px #000;
+}
+
+.text-red {
+  color: #dc3545;
+}
+
+.console-wrapper2 {
+  background-color: #121212;
+  border: 1px solid #2e2e2e;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  width: 100%;
+
+}
+
+.console-wrapper23 {
+  background-color: #121212;
+  border: 1px solid #2e2e2e;
+  border-radius: 10px;
+  padding: 12px;
+
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.console-wrapper2 .section-title {
+  font-weight: bold;
+  color: #ffcc00;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.console-wrapper2 select,
+.console-wrapper2 input {
+  background-color: #1a1a1a;
+  color: #eee;
+  border: 1px solid #444;
+}
+
+
+
+.console-wrapper2 button {
+  font-weight: 500;
+}
+
+
+.resource-name2 {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 6px;
+  color: #299486;
+  text-shadow: 0 0 2px #000;
+}
+
+.batch-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88em;
+  color: #ddd;
+  padding: 1px 2px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.market-value-line {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  margin-left: 4px;
+  margin-right: 4px;
+  font-size: 0.85em;
+  font-weight: bold;
+  color: #9f9;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0e0d0d;
+  padding: 0.6rem 1.2rem;
+  border-bottom: 1px solid #2d2d2e;
+  font-family: 'Arial', sans-serif;
+  z-index: 100;
+}
+
+.nav-logo {
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.3rem;
+  text-shadow: 0 0 6px #ffffff46;
+}
+
+.sell-batch-btn:hover {
+  background: #dc3545;
+  border-color: #9b1f2b;
+}
+
+.move-batch-btn:hover {
+  background: #299486;
+  border-color: #299486;
+}
+
+.move-batch-btn2:hover {
+  background: #ffc107;
+  border-color: #ffc107;
+  color: #000;
+}
+
+.nav-links button {
+  background: transparent;
+  border: 1px solid #444;
+  color: #ddd;
+  padding: 6px 10px;
+  margin-left: 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+#leaderboardTable {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #111;
+  color: #fff;
+  font-size: 0.9rem;
+  border: 1px solid #444;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+#leaderboardTable th {
+  background: #2d2d2d;
+  color: #eee;
+  padding: 6px;
+  text-align: center;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+#leaderboardTable td {
+  padding: 6px;
+  border-top: 1px solid #333;
+  text-align: center;
+  white-space: nowrap;
+}
+
+
+#leaderboardModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  /* semi-transparent dark */
+  z-index: 1000;
+  display: none;
+  /* toggle with JS */
+  justify-content: center;
+  align-items: center;
+}
+
+.player-row {
+  background-color: #111 !important;
+  font-weight: bold;
+}
+
+#leaderboardModal .modal-content {
+  padding: 1rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.rank-delta {
+  font-size: 0.8em;
+  margin-left: 4px;
+}
+
+.rank-delta::after {
+  content: "";
+}
+
+
+
+.rank-up::after {
+  content: "↑";
+  color: #4caf50;
+  margin-left: 4px;
+}
+
+.rank-down::after {
+  content: "↓";
+  color: #f44336;
+  margin-left: 4px;
+}
+
+.leaderboard-player {
+  background-color: rgba(255, 255, 0, 0.05);
+  font-weight: bold;
+}
+
+
+/* Optional: style close button */
+#closeLeaderboardBtn {
+  float: right;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+
+.nav-links button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: #ffffff;
+}
+
+.expandable {
+  cursor: pointer;
+  color: #aaa;
+  font-style: italic;
+  font-size: 0.85em;
+  margin-top: 2px;
+  margin-left: 4px;
+}
+
+.inventory-total {
+  border-top: 1px solid #444;
+  text-align: right;
+  font-size: 1em;
+  color: #ccc;
+  background: #111;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: inset 0 0 4px #00000066;
+}
+
+.inventory-total .total-label {
+  font-weight: bold;
+  font-size: 1em;
+}
+
+.batch-line.expandable:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+
+#loadingOverlay {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  background: #000000e6;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.loading-content {
+  text-align: center;
+  animation: fadeIn 1.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* About modal styling */
+.large-modal {
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #111;
+  color: #ddd;
+  border: 2px solid #444;
+  border-radius: 12px;
+  margin: 5% auto;
+  text-align: justify;
+}
+
+/* Reuse existing .modal and .modal-content styling if you have it */
+#aboutModal .close {
+  float: right;
+  font-size: 24px;
+  color: #aaa;
+  cursor: pointer;
+  text-align: justify;
+}
+
+#aboutModal .close:hover {
+  color: #fff;
+}
+
+.console-wrapper2 select,
+.console-wrapper2 input {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 1px solid #ccc !important;
+}
+
+select {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px;
+  padding: 6px;
+  font-size: 0.95rem;
+}
+
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+}
+
+#leaderboardModal table {
+  width: 100%;
+  /* or fixed px width */
+}
+
+#leaderboardModal table {
+  width: auto;
+  min-width: 100%;
+  table-layout: auto;
+}
+
+#leaderboardModal th,
+#leaderboardModal td {
+  white-space: nowrap;
+  padding: 6px 10px;
+  text-align: center;
+}
+
+#leaderboardModal .player-row {
+  font-weight: bold;
+  color: #ffc107;
+  border-left: 4px solid #ffc107;
+
+}
+
+#leaderboardModal .modal-content {
+  background: #111;
+  border-radius: 8px;
+  max-height: 90vh;
+  max-width: 90vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.leaderboard-scroll-container {
+  max-height: 70vh;
+  /* only this part scrolls */
+  overflow-y: auto;
+  margin-top: 10px;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.console-wrapper {
+  margin-bottom: 1rem;
+}
+
+.contract-card.failed {
+  opacity: 0.6;
+  border-color: #dc3545;
+}
+
+#contractsContainer {
+  max-height: 500px; /* Adjust based on your layout */
+  overflow-y: auto;
+  padding-right: 8px; /* Optional: space for scrollbar */
+}
+
+
+#contractsContainer .contract-card {
+  background-color: #111;
+  color: #ddd;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+#contractsContainer .contract-card h6 {
+  margin-bottom: 6px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+#contractsContainer .contract-card p {
+  margin-bottom: 6px;
+  font-size: 0.9em;
+  color: #ccc;
+}
+
+#contractsContainer .contract-card small {
+  font-size: 0.8em;
+  color: #888;
+}
+
+.contract-card-buttons {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  justify-content: end;
+}
+
+.contract-card-buttons button {
+  font-size: 0.8em;
+  padding: 2px 8px;
+  border: none;
+}
+
+.contract-card-buttons .btn-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.contract-card-buttons .btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Tabs container */
+.custom-tabs {
+  display: flex;
+  background-color: #111;
+  border-bottom: 1px solid #333;
+  margin-bottom: 0.5rem;
+  border-radius: 10px;
+}
+
+/* Individual tab */
+.custom-tab {
+  flex: 1;
+  padding: 8px 16px;
+  text-align: center;
+  cursor: pointer;
+  background-color: #1a1a1a;
+  color: #999;
+  font-weight: bold;
+  border: 1px solid #222;
+  border-radius: 10px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* Active tab */
+.custom-tab.active {
+  background-color: #000;
+  color: #fff;
+  border-top: 2px solid #00ffff;
+  border-left: 1px solid #333;
+  border-right: 1px solid #333;
+  z-index: 1;
+}
+
+/* Tab content */
+.tab-content {
+  background-color: #121212;
+  border: 1px solid #333;
+  border-top: none;
+  padding: 1rem;
+  color: #ccc;
+  font-size: 0.9rem;
+  border-radius: 10px;
+}
+
+/* Override Bootstrap's nav-tabs link colors */
+.nav-tabs .nav-link {
+  color: #aaa;
+  /* Default tab color (greyish) */
+  background-color: #111;
+  /* Dark sci-fi panel feel */
+  border: none;
+  font-weight: bold;
+
+}
+
+.nav-tabs .nav-link.active {
+  color: #fff;
+  /* Active tab text color */
+  background-color: #222;
+  /* Active tab bg */
+  border-bottom: 2px solid #ffc107;
+  /* Highlight color (Atlas yellow) */
+}
+
+.contract-card {
+  background-color: #111;
+  border: 1px solid #333;
+  padding: 10px;
+  border-radius: 6px;
+  color: #ccc;
+}
+
+.contract-card.completed {
+  border-color: green;
+}
+
+.contract-card.expired {
+  border-color: #dc3545;
+  opacity: 0.6;
+}
+
+.contract-card .contract-card-buttons {
+  margin-top: 5px;
+}
+
+.left-panel {
+  background-color: #111;
+  padding: 1rem;
+  border-radius: 6px;
+  min-width: 260px;
+}
+
+.left-panel .nav-tabs .nav-link {
+  color: #ccc;
+}
+.left-panel .nav-tabs .nav-link.active {
+  color: #fff;
+  border-bottom: 2px solid gold;
+}
+.panel-section {
+  margin-top: 10px;
+}
+
+.log-tabs-container {
+  flex-grow: 1;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tab-pane {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.log-section-wrapper {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.nav-tabs .nav-link {
+  color: #ccc;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #111;
+  border-color: transparent transparent #f0c000;
+  color: #fff;
+}
+
+.log-box {
+  background: #000;
+  color: #fff;
+  font-family: monospace;
+  padding: 0.75rem;
+  border: 1px solid #333;
+  border-radius: 4px;
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: 150px;
+
+}
+
+.console-entry {
+  font-size: 0.85em;
+  margin-bottom: 3px;
+  white-space: normal;       /* <-- allow wrapping */
+  word-break: break-word;   
+
+}
+
+.console-timestamp {
+  color: #777;
+  margin-right: 6px;
+}
+
+
+.trade-box {
+  background-color: #111;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 200px;
+  min-width: 200px;
+  box-shadow: 0 0 8px #00000066;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 200px; /* Fixed width */
+}
+
+.log-tabs-container .tab-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.log-tabs-container {
+  flex-grow: 1; /* Fills the rest */
+}
+
+
+.terminal-card {
+  background-color: #111;
+  border: 1px solid #333;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 300px;
+  max-height: 350px;
+  overflow: hidden;
+}
+
+.terminal-header {
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #333;
+  padding: 0.5rem 1rem;
+}
+
+.terminal-header h5 {
+  color: #ccc;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.terminal-body {
+  background-color: #000;
+  padding: 1rem;
+  font-family: monospace;
+  font-size: 0.85rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.terminal-body::-webkit-scrollbar {
+  width: 8px;
+}
+.terminal-body::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+.console-card {
+  min-height: 240px;
+  max-height: 240px;
+  border: 1px solid #444;
+}
+
+.console-area {
+  background-color: #000;
+  padding: 0.5rem;
+  border-radius: 5px;
+  font-family: monospace;
+  white-space: pre-wrap;
+}
+
+#console,
+#marketLog {
+  max-width: 100%;
+  min-width: 100%;
+  height: 120px;
+
+}
+
+.log-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.log-box-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.log-box {
+  flex-grow: 1;
+  background-color: #000;
+  color: #fff;
+  font-family: monospace;
+  font-size: 0.85rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #333;
+  overflow-y: auto;
+  height: 160px; /* 🔒 Locks height */
+  max-height: 160px;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.tax-sidebar {
+  position: fixed;
+  top: 80px;
+  right: 0;
+  width: 240px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background-color: #111;
+  border-left: 2px solid #444;
+  padding: 10px;
+  z-index: 999;
+  box-shadow: -2px 0 6px rgba(0, 255, 255, 0.1);
+  font-size: 0.85rem;
+}
+.tax-sidebar table {
+  width: 100%;
+  font-size: 0.8rem;
+}
+.tax-sidebar thead th {
+  text-align: center;
+  font-size: 0.75rem;
+}
+.tax-sidebar td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Scrollable tax modal */
+.tariff-scroll-modal {
+  max-height: 80vh;
+  overflow-y: auto;
+  background-color: #111;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  color: white;
+}
+
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2px;
+  padding: 0;
+  font-size: 0.75em;
+  line-height: 1.1;
+}
+
+.breakdown .main-value {
+  font-weight: bold;
+  font-size: 0.9em;
+  margin: 0;
+  padding: 0;
+}
+
+.break-line {
+  color: #aaa;
+  margin: 0;
+  padding: 0;
+  font-size: 0.72em;
+}
+
+
+.info-card-wrapper {
+  padding: 6px;
+  margin: 0;
+}
+
+.info-card-wrapper li {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background-color: #111;
+  border-left: 4px solid #555;
+  list-style: none;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+.dark-modal .modal-content {
+  background-color: #111;
+  border: 1px solid #333;
+  color: #eee;
+  border-radius: 8px;
+  padding: 20px;
+  width: 90%;
+  max-width: 650px;
+  position: relative;
+}
+
+.warp-route-text p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.galactic-map {
+  margin-top: 15px;
+  border: 1px solid #333;
+  padding: 10px;
+  background: radial-gradient(#0d0d0d, #000);
+  text-align: center;
+}
+
+.galactic-map img {
+  max-width: 100%;
+  opacity: 0.8;
+  filter: contrast(1.1) brightness(1.2);
+}
+
+.modal-footer {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.modal-footer .btn {
+  margin-left: 10px;
+}
+
+.modal {
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0; width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: #111;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 90%;
+  max-height: 80%;
+  overflow-y: auto;
+}
+.modal .close {
+  position: absolute;
+  top: 10px; right: 20px;
+  font-size: 2rem;
+  color: #888;
+  cursor: pointer;
+}
+
+#warpConfirmModal {
+  display: none;
+}
+
+#logisticsTabs {
+  display: flex;
+  width: 100%;
+}
+
+#logisticsTabs .nav-item {
+  flex: 1;
+  text-align: center;
+}
+
+#logisticsTabs .nav-link {
+  width: 100%;
+  border-radius: 10;
+}
+
+#loadingOverlay {
+  transition: opacity 0.5s ease;
+}
+
+#loadingOverlay.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#warpModal {
+  display: none;
+}
+
+.glitch-effect {
+  position: relative;
+  display: inline-block;
+  color: #ffc107;
+  font-weight: bold;
+  text-shadow: 0 0 2px #ffc107, 1px 0 #555555, -1px 0 #000000;
+  background: none !important;
+  padding: 0;
+  animation: glitch-move 1s infinite linear alternate;
+}
+
+.glitch-effect::before,
+.glitch-effect::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: transparent;
+  color: #ffc107;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.glitch-effect::after {
+  left: 2px;
+  text-shadow: -1px 0 rgb(48, 48, 48);
+  animation: glitch-1 2s infinite linear alternate-reverse;
+}
+
+.glitch-effect::before {
+  left: -2px;
+  text-shadow: 1px 0 #ffc107;
+  animation: glitch-2 2s infinite linear alternate-reverse;
+}
+
+/* Shake / jitter animation */
+@keyframes glitch-move {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-1px, 1px); }
+  40% { transform: translate(1px, -1px); }
+  60% { transform: translate(-1px, 0); }
+  80% { transform: translate(1px, 1px); }
+}
+
+/* Glitch clipping layers */
+@keyframes glitch-1 {
+  0% { clip: rect(20px, 9999px, 21px, 0); }
+  10% { clip: rect(0, 9999px, 5px, 0); }
+  20% { clip: rect(30px, 9999px, 60px, 0); }
+  30% { clip: rect(15px, 9999px, 35px, 0); }
+  40% { clip: rect(10px, 9999px, 50px, 0); }
+  100% { clip: rect(25px, 9999px, 55px, 0); }
+}
+
+@keyframes glitch-2 {
+  0% { clip: rect(15px, 9999px, 25px, 0); }
+  10% { clip: rect(5px, 9999px, 20px, 0); }
+  20% { clip: rect(25px, 9999px, 35px, 0); }
+  30% { clip: rect(0px, 9999px, 10px, 0); }
+  40% { clip: rect(20px, 9999px, 40px, 0); }
+  100% { clip: rect(10px, 9999px, 30px, 0); }
+}
+
+
+
+
+
+
+
+
+
+
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
