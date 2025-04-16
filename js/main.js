@@ -425,6 +425,21 @@ function getTimeSeededPrice(system, resource) {
   return parseFloat(clamped.toFixed(2));
 }
 
+async function fetchLastUpdated() {
+  try {
+      const repoOwner = 'atlas-equinox';
+      const repoName = 'atlas-equinox.github.io';
+      const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}`);
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      const lastUpdated = new Date(data.updated_at).toLocaleString();
+      document.getElementById('last-updated').innerText = lastUpdated;
+  } catch (error) {
+      console.error('Error fetching the GitHub repo:', error);
+      document.getElementById('last-updated').innerText = 'Error fetching data';
+  }
+}
+
 function populateCustomDropdown(listId, items, onClickHandler) {
   const list = document.getElementById(listId);
   list.innerHTML = ""; // Clear existing items
@@ -2753,6 +2768,7 @@ window.onload = function () {
 
   initGame();
 
+
   for (const name of SYSTEM_NAMES) {
     systems[name].specializations = SYSTEM_SPECIALIZATIONS[name] || [];
     applySystemSpecializations(name);
@@ -2763,6 +2779,7 @@ window.onload = function () {
 
   simulateNpcBehavior();
   renderTaxSidebar();
+  fetchLastUpdated()
   setTimeout(() => {
     const overlay = document.getElementById("loadingOverlay");
     overlay.classList.add("hide");
