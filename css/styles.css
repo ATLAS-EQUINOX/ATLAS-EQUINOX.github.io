@@ -73,6 +73,17 @@ body, html {
   text-align: center;
 }
 
+.nav-separator {
+  display: inline-block;
+  width: 1px;
+  height: 24px;
+  background-color: #555;
+  margin: 0 12px;
+  opacity: 0.5;
+  vertical-align: middle;
+}
+
+
 #spreadTable th {
   background: transparent !important;
   box-shadow: none !important;

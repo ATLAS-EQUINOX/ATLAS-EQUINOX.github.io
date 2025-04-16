@@ -375,11 +375,12 @@ function cleanNumber(num) {
 }
 
 function showWelcomeModal() {
-  const welcomeModal = document.getElementById("WelcomeModal");
+  const welcomeModal = document.getElementById("AboutModal");
   if (welcomeModal) {
     welcomeModal.style.display = "block";
   }
 }
+
 
 function getTimeSeededPrice(system, resource) {
   const time = new Date();
@@ -2460,26 +2461,24 @@ function buyMaterial() {
   const amt = parseInt(amtInput.value);
   if (!amt || amt <= 0) return log("Invalid quantity.");
 
-  const systemMarket = systems[player.location].market[res];
-  if (!systemMarket)
-    return log(`${res} is not currently available in ${player.location}.`);
+  const system = systems[player.location];
+  const market = system.market[res];
+  if (!market) return log(`${res} is not currently available in ${player.location}.`);
 
-  const basePrice = systems[player.location].prices[res];
+  const basePrice = system.prices[res];
   const { buyPrice } = getBuySellPrice(basePrice);
-  const importTaxRate = systems[player.location]?.tariffs?.importTaxRate || 0;
-  const taxAmount = buyPrice * amt * importTaxRate;
-  const totalCost = buyPrice * amt + taxAmount;
+  const importTaxRate = system.tariffs?.importTaxRate || 0;
+
+  const unitCost = buyPrice * (1 + importTaxRate);
+  const totalCost = unitCost * amt;
 
   if (player.credits < totalCost) {
-    const maxAffordable = Math.floor(player.credits / buyPrice);
+    const maxAffordable = Math.floor(player.credits / unitCost);
     if (maxAffordable > 0) {
       amtInput.value = maxAffordable;
-      return log(
-        `Not enough credits. You can afford up to ${maxAffordable}x ${res}.`
-      );
-    } else {
-      return log("Not enough credits to buy any units.");
+      return log(`Not enough credits. You can afford up to ${maxAffordable}x ${res}.`);
     }
+    return log("Not enough credits to buy any units.");
   }
 
   // ✅ Set the trade function
@@ -2495,22 +2494,22 @@ function buyMaterial() {
 
     recentPlayerBuys[`${player.location}-${res}`] = Date.now();
 
-    const market = systems[player.location].market[res];
     market.demand += amt;
 
     const ratio = market.demand / market.supply;
     const base = RESOURCE_DATA[res].base;
-    let newPrice =
-      buyPrice * (ratio > 1 ? 1 + (ratio - 1) * 0.01 : 1 - (1 - ratio) * 0.01);
-    newPrice = Math.max(base * 0.5, Math.min(base * 3, newPrice));
-    systems[player.location].prices[res] = parseFloat(newPrice.toFixed(2));
+    let newPrice = buyPrice * (ratio > 1 ? 1 + (ratio - 1) * 0.01 : 1 - (1 - ratio) * 0.01);
+    system.prices[res] = parseFloat(
+      Math.max(base * 0.5, Math.min(base * 3, newPrice)).toFixed(2)
+    );
+
     flash("credits");
     updateUI();
   };
 
-  // ✅ Run it
   showTradeSummary("buy", res, amt, buyPrice);
 }
+
 
 function showTradeSummary(type, res, amt, price) {
   const location = player.location;
@@ -2804,33 +2803,51 @@ oldConfirmBtn.replaceWith(newConfirmBtn);
 newConfirmBtn.addEventListener("click", confirmWarp);
 
 // Modal openers
+
+// About Modal Logic
 document.getElementById("openAboutBtn").addEventListener("click", () => {
-  document.getElementById("aboutModal").style.display = "block";
+  document.getElementById("AboutModal").style.display = "block";
 });
+document.getElementById("closeInfoBtn").addEventListener("click", () => {
+  document.getElementById("AboutModal").style.display = "none";
+});
+window.addEventListener("click", (e) => {
+  const aboutModal = document.getElementById("AboutModal");
+  if (e.target == aboutModal) {
+    aboutModal.style.display = "none";
+  }
+});
+
+document.getElementById("devLogModal").style.display = "none";
+
+document.getElementById("openDevLogBtn").addEventListener("click", () => {
+  document.getElementById("devLogModal").style.display = "block";
+});
+
+document.getElementById("closeDevLogBtn").addEventListener("click", () => {
+  document.getElementById("devLogModal").style.display = "none";
+});
+
+window.addEventListener("click", (e) => {
+  const modal = document.getElementById("devLogModal");
+  if (e.target == modal) {
+    modal.style.display = "none";
+  }
+});
+
+
 document.getElementById("openTariffBtn").addEventListener("click", () => {
   renderTariffModal();
   document.getElementById("tariffModal").style.display = "block";
 });
-
-// Modal closers
-document.getElementById("closeAboutBtn").addEventListener("click", () => {
-  document.getElementById("aboutModal").style.display = "none";
-});
 document.getElementById("closeTariffBtn").addEventListener("click", () => {
   document.getElementById("tariffModal").style.display = "none";
 });
-document.getElementById("closeWelcomeBtn").addEventListener("click", () => {
-  document.getElementById("WelcomeModal").style.display = "none";
-});
+
 
 // Close modals on outside click
 window.addEventListener("click", (e) => {
-  if (e.target.id === "WelcomeModal") {
-    document.getElementById("WelcomeModal").style.display = "none";
-  }
-  if (e.target.id === "aboutModal") {
-    document.getElementById("aboutModal").style.display = "none";
-  }
+
   if (e.target.id === "tariffModal") {
     document.getElementById("tariffModal").style.display = "none";
   }

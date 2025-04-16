@@ -34,10 +34,18 @@
     </div>
   
     <div class="nav-links">
-      <button id="openAboutBtn"><i class="fa fa-book"></i> | About ΛΞ</button>
-      <button id="openLeaderboardBtn"><i class="fa fa-trophy"></i> | Sector Corporate Leaderboard</button>
-      <button onclick="saveGameState(logToConsole = true)"><i class="fa fa-save"></i> | Save</button>
+      <div class="nav-separator"></div>
+      
+      
+      <button id="openLeaderboardBtn"><i class="fa fa-trophy"></i> | NPC Leaderboard</button>
+      <div class="nav-separator"></div>
+      <button onclick="saveGameState(logToConsole = true)"><i class="fa fa-save"></i> | Save Game</button>
       <button onclick="resetGameState()"><i class="fa fa-trash-o"></i> | Reset Save</button>
+      <div class="nav-separator"></div>
+      <button id="openAboutBtn"><i class="fa fa-book"></i> | About</button>
+
+      <button id="openDevLogBtn"><i class="fa fa-code" aria-hidden="true"></i> | Dev</button>
+      <div class="nav-separator"></div>
     </div>
   </nav>
   
@@ -88,70 +96,62 @@
     </div>
   </div>
 
-  <div id="WelcomeModal" class="modal" style="display: none;">
-    <div class="modal-content large-modal">
-      <div id="WelcomeContent">
-        <h3>ΛTLΛS | ΞQUINOX™</h3>
-        <p>
-          Welcome to ΛΞ, Intern-324234231.
-        </p>
-        <p>
-          You are a disposable yet vital cog in ΛΞ’s ever-churning interstellar profit engine. As part of your
-          mandatory-voluntary
-          contract, you will source volatile resources, authorize ethically interpretive trades, and exploit market
-          collapses
-          across economically impoverished systems.
-        </p>
-        <p></p>
+  <div id="AboutModal" class="modal" style="display: none;">
+  <div class="modal-content large-modal">
+    <span id="closeInfoBtn" class="close">&times;</span>
 
-        <p>
-          To get you started, ΛΞ have generously provided you with <strong><span class="text-success">100ᶜ</span></strong> - Please note any and all profits generated from this starting credit are legally, spiritually, and metaphysically the property of ΛTLΛS | ΞQUINOX™. In return, you may
-          earn radiation sickness capsules and hydration credits (<span class="text-warning"><i>*pending managerial approval - which may be reasonably withheld</i></span>).
-        <p>
-          Every resource is a
-          unit. Every decision is a liability. Every failure is documented, analyzed, repackaged, and sold as a
-          consultancy insight.
-        </p>
-        </p>
-        <span id="closeWelcomeBtn" class="close">&times;</span>
-        <hr>
+    <h3>ΛTLΛS | ΞQUINOX™</h3>
 
-        <p class="text-muted small">
-          <span class="text-danger"><i>By using this terminal, you agree to the ΛTLΛS | ΞQUINOX™ End-User License
-              Agreement
-              (pages.413-3405, p.654 SC.435.5.A) which you definitely read, understood, and internalized
-              spiritually.</i></span>
-        </p>
-      </div>
-    </div>
-  </div>
+    <!-- Welcome Section -->
+    <section id="welcomeSection">
+      <p>Welcome to ΛΞ, Intern-324234231.</p>
+      <p>
+        You are a disposable yet vital cog in ΛΞ’s ever-churning interstellar profit engine. As part of your
+        mandatory-voluntary contract, you will source volatile resources, authorize ethically interpretive trades, and
+        exploit market collapses across economically impoverished systems.
+      </p>
+      <p>
+        To get you started, ΛΞ have generously provided you with
+        <strong><span class="text-success">100ᶜ</span></strong> – Please note any and all profits generated from this
+        starting credit are legally, spiritually, and metaphysically the property of ΛTLΛS | ΞQUINOX™. In return, you
+        may earn radiation sickness capsules and hydration credits
+        (<span class="text-warning"><i>*pending managerial approval – which may be reasonably withheld</i></span>). Every resource is a unit. Every decision is a liability. Every failure is documented, analyzed, repackaged, and
+        sold as a consultancy insight.
+      </p>
+      <hr>
+    
+    </section>
 
-
-
-  <!-- About Modal -->
-  <div id="aboutModal" class="modal" style="display: none;">
-    <div class="modal-content large-modal">
-      <div id="aboutContent">
-        <h3>ΛTLΛS | ΞQUINOX™</h3>
-        <p>
-          Born in the fiscal black hole of late-stage capitalism, ΛTLΛS | ΞQUINOX™ was formed from the hostile merger of
-          two economic behemoths:
-          ΛTLΛS Logistics, the galaxy’s most aggressive supply chain megacorp (specializing in efficiency and moral
-          flexibility),
-          and ΞQUINOX Holdings, a shadowy megafund known for asset acquisition, time manipulation, and occasionally
-          purchasing entire quadrants.
-        </p>
-        <p>
-          The merger baffled regulators, terrified investors, and incidentally destabilized the three moons of
-          Tai-Ceti-5.
-        </p>
+    <!-- About Section -->
+    <section id="aboutSection">
+      <h4>About ΛΞ™</h4>
+      <p>
+        Born in the fiscal black hole of late-stage capitalism, ΛTLΛS | ΞQUINOX™ was formed from the hostile merger of
+        two economic behemoths: ΛTLΛS Logistics, the galaxy’s most aggressive supply chain megacorp (specializing in
+        efficiency and moral flexibility), and ΞQUINOX Holdings, a shadowy megafund known for asset acquisition, time
+        manipulation, and occasionally purchasing entire quadrants.
+      </p>
+      <p>
+        The merger baffled regulators, terrified investors, and incidentally destabilized the three moons of
+        Tai-Ceti-5.
+      </p>
+      <p>
         The result? A single hypercapitalist juggernaut whose quarterly profits outpace some galactic GDPs and whose
-        market brokers (like you Intern-324234231!) are mostly still unpaid interns.
-        </p>
-        <span id="closeAboutBtn" class="close">&times;</span>
-      </div>
-    </div>
+        market brokers (like you, Intern-324234231!) are mostly still unpaid interns.
+      </p>
+      <hr>
+    </section>
+    <p class="text-muted small">
+      <span class="text-danger"><i>By using this terminal, you agree to the ΛTLΛS | ΞQUINOX™ End-User License
+          Agreement (pages.413–3405, p.654 SC.435.5.A) which you definitely read, understood, and internalized
+          spiritually.</i></span>
+    </p>
+
   </div>
+</div>
+
+
+
 
 
   <!-- Main Layout -->
@@ -301,7 +301,7 @@
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link disabled" id="Investments-tab" data-bs-toggle="tab" data-bs-target="#Investments"
-            type="button" role="tab" disabled>Investments</button>
+            type="button" role="tab" disabled>+</button>
         </li>
         
 
@@ -373,6 +373,19 @@
       </table>
     </div>
   </div>
+
+  <div id="devLogModal" class="modal2warp" style="display: none;">
+    <div class="modal-content galactic-style width:400px">
+      <span id="closeDevLogBtn" class="close">&times;</span>
+      <h3>Bugs or suggestions etc</h3>
+      <hr>
+      <p><strong>Discord:</strong> <code>m6344</code></p>
+
+      <p><strong>GitHub:</strong> <a href="https://github.com/ATLAS-EQUINOX/ATLAS-EQUINOX.github.io" target="_blank">https://github.com/ATLAS-EQUINOX/ATLAS-EQUINOX.github.io</a></p>
+      
+    </div>
+  </div>
+  
 
   <div id="warpModal" class="modal2warp">
     <div class="modal-content galactic-style width:400px">
