@@ -2038,18 +2038,11 @@ function updateMarketTable() {
 
         cell.innerHTML = `
           ${displayHTML}
-          <span class="trend-indicator ${trend}"></span>
           <div class="supply-demand-info">
             <span>S: ${formatEstimate(market.supply, hops)}${UNIT}</span><br>
             <span>D: ${formatEstimate(market.demand, hops)}${UNIT}</span>
           </div>`;
 
-
-
-
-        cell.addEventListener("click", () => {
-          // optional detail popup or graph
-        });
       }
 
       row.appendChild(cell);

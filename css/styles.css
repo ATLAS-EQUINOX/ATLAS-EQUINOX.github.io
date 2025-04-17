@@ -34,15 +34,17 @@ body, html {
 }
 
 .supply-demand-info {
-  font-size: 0.65em;
-  color: #aaa;
+  font-size: 0.57em;
+  background-color: rgba(0, 255, 255, 0.08);
+  padding: 2px 5px;
+  border-radius: 4px;
   margin-top: 4px;
-  line-height: 1.2;
+
+  text-align: center;
+
 }
 
-.supply-demand-info strong {
-  color: #ccc;
-}
+
 
 #market-container {
   flex-grow: 1;
