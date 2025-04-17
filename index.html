@@ -29,6 +29,8 @@
     <div class="loading-content">
       <output class="spinner-border text-info mb-3" name="warpStatus"></output>
       <div class="nav-logo resource-name"><strong>ΛTLΛS | ΞQUINOX™</strong><br><small>An Interstellar Trading Company</small> </div>
+      <button class="btn btn-danager" onclick="resetGameState()">Emergency Save Reset</button>
+
     </div>
   </div>
 
@@ -42,7 +44,7 @@
     </div>
   
     <div class="nav-links">
-      <div class="nav-separator"></div>
+
 
       
       <button id="openLeaderboardBtn"><i class="fa fa-trophy"></i> | NPC Leaderboard</button>
@@ -54,9 +56,8 @@
       <button onclick="saveGameState(logToConsole = true)"><i class="fa fa-save"></i> | Save Game</button>
       <button onclick="resetGameState()"><i class="fa fa-trash-o"></i> | Reset Save</button>
       <div class="nav-separator"></div>
-      <button id="openAboutBtn"><i class="fa fa-book"></i> | About</button>
-      <button id="openDevLogBtn"><i class="fa fa-code" aria-hidden="true"></i> | Dev</button>
-      <div class="nav-separator"></div>
+      <button id="openDevLogBtn"><i class="fa fa-code" aria-hidden="true"></i> | Development</button>
+
     </div>
   </nav>
   
@@ -107,14 +108,14 @@
     </div>
   </div>
 
-  <div id="AboutModal" class="modal" style="display: none;">
+<div id="HelpModal" class="modal" style="display: none;">
   <div class="modal-content large-modal">
-    <span id="closeInfoBtn" class="close">&times;</span>
+    <span id="closeHelpBtn" class="close">&times;</span>
 
     <h3>ΛTLΛS | ΞQUINOX™</h3>
 
     <!-- Welcome Section -->
-    <section id="welcomeSection">
+    <section id="helpSection">
       <p>Welcome to ΛΞ, Intern-324234231.</p>
       <p>
         You are a disposable yet vital cog in ΛΞ’s ever-churning interstellar profit engine. As part of your
@@ -123,56 +124,12 @@
       </p>
       <p>
         To get you started, ΛΞ have generously provided you with
-        <strong><span class="text-success">100ᶜ</span></strong> – Please note any and all profits generated from this
+        <strong><span class="text-success">100ᶜ</span></strong> to start off with – Please note any and all profits generated from this
         starting credit are legally, spiritually, and metaphysically the property of ΛTLΛS | ΞQUINOX™. In return, you
         may earn radiation sickness capsules and hydration credits
         (<span class="text-warning"><i>*pending managerial approval – which may be reasonably withheld</i></span>). Every resource is a unit. Every decision is a liability. Every failure is documented, analyzed, repackaged, and
         sold as a consultancy insight.
       </p>
-      <hr>
-    
-    </section>
-
-    <!-- About Section -->
-    <section id="aboutSection">
-      <h4>About ΛΞ™</h4>
-      <p>
-        Born in the fiscal black hole of late-stage capitalism, ΛTLΛS | ΞQUINOX™ was formed from the hostile merger of
-        two economic behemoths: ΛTLΛS Logistics, the galaxy’s most aggressive supply chain megacorp (specializing in
-        efficiency and moral flexibility), and ΞQUINOX Holdings, a shadowy megafund known for asset acquisition, time
-        manipulation, and occasionally purchasing entire quadrants.
-      </p>
-      <p>
-        The merger baffled regulators, terrified investors, and incidentally destabilized the three moons of
-        Tai-Ceti-5.
-      </p>
-      <p>
-        The result? A single hypercapitalist juggernaut whose quarterly profits outpace some galactic GDPs and whose
-        market brokers (like you, Intern-324234231!) are mostly still unpaid interns.
-      </p>
-      <hr>
-    </section>
-    <p class="text-muted small">
-      <span class="text-danger"><i>By using this terminal, you agree to the ΛTLΛS | ΞQUINOX™ End-User License
-          Agreement (pages.413–3405, p.654 SC.435.5.A) which you definitely read, understood, and internalized
-          spiritually.</i></span>
-    </p>
-
-  </div>
-</div>
-
-
-<div id="HelpModal" class="modal" style="display: none;">
-  <div class="modal-content large-modal">
-    <span id="closeHelpBtn" class="close">&times;</span>
-
-    <h3>ΛTLΛS | ΞQUINOX™ - Help</h3>
-
-    <!-- Welcome Section -->
-    <section id="helpSection">
-      <p>Welcome to ΛΞ, Intern-324234231.</p>
-      <p>You’ve just been assigned to Atlas Equinox's remote trading interface. Your mission is to grow company profits by buying low, selling high, managing logistics, and navigating volatile interstellar markets across multiple systems.</p>
-
       <hr>
 
       <h4>Basic Gameplay</h4>
@@ -196,6 +153,31 @@
         <li>Each system specializes in certain resources, which affects pricing and availability.</li>
         <li>NPC corporations also trade, influencing the market with their own strategies.</li>
       </ul>
+      <hr>
+      <h4>About ΛΞ™</h4>
+      
+      <p>
+        Born in the fiscal black hole of late-stage capitalism, ΛTLΛS | ΞQUINOX™ was formed from the hostile merger of
+        two economic behemoths: ΛTLΛS Logistics, the galaxy’s most aggressive supply chain megacorp (specializing in
+        efficiency and moral flexibility), and ΞQUINOX Holdings, a shadowy megafund known for asset acquisition, time
+        manipulation, and occasionally purchasing entire quadrants.
+      </p>
+      <p>
+        The merger baffled regulators, terrified investors, and incidentally destabilized the three moons of
+        Tai-Ceti-5.
+      </p>
+      <p>
+        The result? A single hypercapitalist juggernaut whose quarterly profits outpace some galactic GDPs and whose
+        market brokers (like you, Intern-324234231!) are mostly still unpaid interns.
+      </p>
+      <hr>
+    </section>
+    <p class="text-muted small">
+      <span class="text-danger"><i>By using this terminal, you agree to the ΛTLΛS | ΞQUINOX™ End-User License
+          Agreement (pages.413–3405, p.654 SC.435.5.A) which you definitely read, understood, and internalized
+          spiritually.</i></span>
+    </p>
+      
     </section>
   </div>
 </div>
@@ -271,6 +253,8 @@
         <div class="market-wrapper d-flex flex-column flex-grow-1">
 
           <!-- Market Overview Header -->
+
+
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h5 class="mb-0">Current System: <span id="location2" class="resource-name">~</span></h5>
 
@@ -469,7 +453,6 @@
 
   <script src="./js/main.js" defer></script>
   <script src="./js/trade_contracts.js" defer></script>
-  <script src="./js/warp.js" defer></script>
 
   <link rel="shortcut icon" href="images/Fav.png">
   <link rel="icon" type="image/png" sizes="32x32" href="images/Fav.png">

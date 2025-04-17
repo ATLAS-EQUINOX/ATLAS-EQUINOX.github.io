@@ -45,6 +45,8 @@ const RESOURCE_TYPES = [
   "Fuel",
 ];
 
+
+
 const RESOURCE_DATA = {
   Iron: {
     base: 45, // Abundant structural metal
@@ -134,18 +136,6 @@ const SYSTEM_NAMES = [
   "Kapteyn's Star",
   "Kepler-22b",
   "Kepler-442b",
-  "Kepler-452b",
-  "Lalande 21185",
-  "Luyten's Star",
-  "Proxima Centauri",
-  "Ross 128",
-  "Sirius",
-  "Sol",
-  "Tau Ceti",
-  "TRAPPIST-1e",
-  "Vega",
-  "Wolf 359",
-  "YZ Ceti"
 ];
 
 const SPECIALIZATION_EFFECTS = {
@@ -172,18 +162,6 @@ const SYSTEM_SPECIALIZATIONS = {
   "Kapteyn's Star": ["Ice"],
   "Kepler-22b": ["Gases"],
   "Kepler-442b": ["Ice"],
-  "Kepler-452b": ["Organics"],
-  "Lalande 21185": ["Fuel"],
-  "Luyten's Star": ["Gases"],
-  "Proxima Centauri": ["Ice"],
-  "Ross 128": ["Metals"],
-  "Sirius": ["Fuel"],
-  "Sol": ["Organics"],
-  "Tau Ceti": ["Organics"],
-  "TRAPPIST-1e": ["Ice"],
-  "Vega": ["Rare Earths"],
-  "Wolf 359": ["Metals"],
-  "YZ Ceti": ["Fuel"]
 };
 
 
@@ -202,25 +180,13 @@ const WARP_GRAPH = {
   "Kapteyn's Star": ["Barnard's Star", "Gliese 581", "Lalande 21185"],
   "Kepler-22b": ["HD 40307", "Gliese 667 C", "Kepler-442b"],
   "Kepler-442b": ["Kepler-22b", "Beta Pictoris", "Wolf 359"],
-  "Kepler-452b": ["55 Cancri", "Luyten's Star", "Ross 128"],
-  "Lalande 21185": ["Kapteyn's Star", "HD 40307", "Sol"],
-  "Luyten's Star": ["Kepler-452b", "Epsilon Eridani"],
-  "Proxima Centauri": ["Alpha Centauri", "Tau Ceti"],
-  "Ross 128": ["Alpha Centauri", "Kepler-452b"],
-  "Sirius": ["Fomalhaut", "Sol", "Vega"],
-  "Sol": ["Alpha Centauri", "Sirius", "Lalande 21185"],
-  "Tau Ceti": ["Barnard's Star", "HD 40307", "Proxima Centauri"],
-  "TRAPPIST-1e": ["Epsilon Eridani", "Fomalhaut"],
-  "Vega": ["Sirius", "Altair", "55 Cancri"],
-  "Wolf 359": ["Barnard's Star", "Kepler-442b"],
-  "YZ Ceti": ["Altair"]
 };
 
 
 
 
 const FUEL_CAPACITY = 500;
-const TRAVEL_FUEL_COST = 10;
+const TRAVEL_FUEL_COST = 10 * (Math.random() * 0.5 + 0.75); // Random between 7.5-12.5
 const npcCorporations = [
   "ÆTHRΛ GROUP",
   "Aegis Starfreight Inc.",
@@ -754,7 +720,7 @@ function updateGameAgeDisplay() {
 
 function saveGameState(logToConsole = false) {
   const state = {
-    seenWelcome: true,
+
     credits: player.credits,
     fuel: player.fuel,
     inventory: player.inventory,
@@ -849,12 +815,6 @@ function loadGameState() {
       });
     });
 
-    // ✅ Show Welcome only once per save
-    if (!state.seenWelcome) {
-      showWelcomeModal();
-      state.seenWelcome = true;
-      localStorage.setItem("atlasSave", JSON.stringify(state));
-    }
 
   } catch (e) {
     console.error("Failed to load save:", e);
@@ -2020,15 +1980,15 @@ function updateMarketTable() {
 
 
   function formatEstimate(val, hops) {
-    if (hops === null || hops > 20) return "∅";
+    if (hops === null || hops > 12) return "∅";
+
   
-    if (hops <= 4) return val.toFixed(2);         // Precise for local
-    if (hops === 6) return val.toFixed(1);        // Slightly rounded
-    if (hops <= 10) return Math.round(val).toString(); // Whole numbers
-    if (hops <= 12) return `${Math.round(val / 5) * 5}`; // Round to nearest 5
-    if (hops <= 14) return `${Math.round(val / 10) * 10}`; // Nearest 10
-    if (hops <= 17) return `${Math.round(val / 25) * 25}`; // Nearest 25
-    return `${Math.round(val / 50) * 50}`;         // Heavily rounded
+    if (hops <= 5) return val.toFixed(2);
+    if (hops === 6) return val.toFixed(1);
+    if (hops <= 10) return Math.round(val).toString();
+     // Hide zero estimates
+    return `${Math.round(val / 25) * 25}`;
+
   }
 
   rows.forEach(({ system, prices }) => {
@@ -2057,7 +2017,7 @@ function updateMarketTable() {
         cell.className = "text-muted text-center unavailable-cell";
         cell.innerHTML = isCorrupted
           ? `<span class="glitch-effect" data-text="">∅</span>`
-          : "X";
+          : "—";
       } else {
         const trend = lastPrices[`${system}-${res}`]?.trend ?? "same";
 
@@ -2160,7 +2120,7 @@ function beginWarpStep(hopIndex) {
   const from = warpTargetPath[hopIndex - 1];
   const to = warpTargetPath[hopIndex];
   const variation = 2 + (Math.random() * 0.1 - 0.05); // 0.95 to 1.05
-  const segmentFuelCost = parseFloat((TRAVEL_FUEL_COST * variation).toFixed(2));
+  const segmentFuelCost = TRAVEL_FUEL_COST
 
 
   if (player.fuel < segmentFuelCost) {
@@ -2761,26 +2721,13 @@ window.onload = function () {
   for (let i = 1; i < 4; i++) generateContract();
   renderAvailableContracts();
   setTimeout(hideLoadingOverlay, 1000);
-  //setInterval(() => {
-  //  const count = getTradesLastMinute();
-   // document.getElementById("tradeCount").textContent = count;
- // }, 1000);
+
 
   // Remove old listeners from confirm button safely
 const oldConfirmBtn = document.getElementById("confirmWarpBtn");
 const newConfirmBtn = oldConfirmBtn.cloneNode(true);
 oldConfirmBtn.replaceWith(newConfirmBtn);
 newConfirmBtn.addEventListener("click", confirmWarp);
-
-// Modal openers
-
-// About Modal Logic
-document.getElementById("openAboutBtn").addEventListener("click", () => {
-  document.getElementById("AboutModal").style.display = "block";
-});
-document.getElementById("closeInfoBtn").addEventListener("click", () => {
-  document.getElementById("AboutModal").style.display = "none";
-});
 
 document.getElementById("openHelpBtn").addEventListener("click", () => {
   document.getElementById("HelpModal").style.display = "block";

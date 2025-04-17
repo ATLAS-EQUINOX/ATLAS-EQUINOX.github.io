@@ -109,6 +109,44 @@ body, html {
   }
 }
 
+#blackMarketHeadingTable th,
+#blackSpreadTable th {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 6px 8px;
+  text-align: center;
+  color: #ffffff;
+}
+
+#blackMarketHeadingTable,
+#blackSpreadTable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+#blackMarketTable th,
+#blackMarketTable td {
+  padding: 0.5rem 0.4rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+#blackMarketTable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+#blackMarketTable th:first-child,
+#blackMarketTable td:first-child {
+  white-space: normal;
+  word-break: break-word;
+  max-width: 100px;
+}
+
+
+
+
 
 
 #spreadTable th {
