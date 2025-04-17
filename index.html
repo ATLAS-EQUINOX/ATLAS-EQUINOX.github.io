@@ -17,10 +17,18 @@
 
 <body>
 
+  <div id="mobile-blocker">
+    <div class="mobile-blocker-content">
+      <h2>🚫 Unsupported Screen Size</h2>
+      <p>This game is best experienced on larger screens. Please use a tablet or desktop device.</p>
+    </div>
+  </div>
+  
+
   <div id="loadingOverlay">
     <div class="loading-content">
       <output class="spinner-border text-info mb-3" name="warpStatus"></output>
-      <div class="nav-logo"><strong>ΛTLΛS | ΞQUINOX™</strong><br><small>An Interstellar Trading Company</small> </div>
+      <div class="nav-logo resource-name"><strong>ΛTLΛS | ΞQUINOX™</strong><br><small>An Interstellar Trading Company</small> </div>
     </div>
   </div>
 
@@ -206,7 +214,7 @@
       <section class="console-wrapper2 mb-3">
         <small>
           <b>Credits:</b> <span id="credits">~</span>ᶜ<br>
-          <b>Fuel:</b> <span id="fuel">~</span>ᵣ / 500ᵣ<br>
+          <b>Fuel:</b> <span id="fuel">~</span>ᵣ / 1000ᵣ<br>
 
           <b>Inventory:</b> <span  id="inventoryCount">~</span>ᵣ</text><br>
          <b>ΛΞ Vault:</b> <span  id="vaultCount">~</span>ᵣ</text><br>
@@ -218,8 +226,7 @@
 
       <section class="console-wrapper2 mb-3 overflow: hidden;">
 
-        <small><label class="form-label"><text class="highlight">Current System: </text><span id="location"
-              class="resource-name">Sol</span></label></small>
+        <small><label class="form-label"><text class="highlight">Warp: </text></label></small>
         <select id="travelSearch" class="form-select mb-2">
         </select>
         <button id="travelButton" class="btn btn-outline-warning w-100" onclick="travel()">Warp</button>
@@ -233,10 +240,7 @@
         <input type="number" id="buyAmount" maxlength="3" min="1" class="form-control mb-2" value="5"
           placeholder="Amount" />
         <button class="btn btn-success w-100" onclick="buyMaterial()">Buy</button>
-      </section>
 
-      <!-- Sell Box -->
-      <section class="console-wrapper2 mb-3">
         <small><label class="form-label"><text class="highlight">Sell Resource: </text></label></small>
         <select id="sellResourceSelect" class="form-select mb-2"></select>
         <input type="number" id="sellAmount" maxlength="3" min="1" class="form-control mb-2" value="5"
@@ -244,10 +248,14 @@
         <button class="btn btn-danger w-100" onclick="sellMaterial()">Sell</button>
       </section>
 
+      <!--
 
+      for NPC Debug etc
       <text id="tradeStats" class="trade-stats greyed-out">Trade Counter: <span id="tradeCount">0</span></text>
-      <div id="saveStatus" class="greyed-out">Loading...</div>
-      <span class="greyed-out" id="last-updated">Loading...</span></h>
+       -->
+
+      <text style="color: #ffc107;">Game Last Saved: </text><br><div id="saveStatus" class="greyed-out">Loading...</div>
+      
 
 
 
@@ -264,7 +272,7 @@
 
           <!-- Market Overview Header -->
           <div class="d-flex justify-content-between align-items-center mb-2">
-            <h5 class="mb-0">Market Overview:</h5>
+            <h5 class="mb-0">Current System: <span id="location2" class="resource-name">~</span></h5>
 
 
 
@@ -303,11 +311,11 @@
           <div style="margin-top: 0.85rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
             <div>
               <text style="color: #ffc107;">⭓</text>
-              <span class="text-muted small">| System specializes in this resource, often resulting in better pricing or supply.</span>
+              <span class="text-muted small">| System specializes in this resource .</span>
             </div>
             <div>
               <span style="color: #ffffff;"class="glitch-effect" data-text="">∅</span>
-              <span class="text-muted small">| Market data degrades over distance, expect corrupted or uncertain data from some systems.</span>
+              <span class="text-muted small">| Market data degrades over distance, expect some inaccuracies from further away systems.</span>
             </div>
           </div>
           
@@ -319,7 +327,7 @@
 
       <div class="log-row d-flex gap-3 mt-2">
         <div class="console-wrapper2 flex-fill log-box-container">
-          <h5>ΛΞ Terminal:</h5>
+          <h5>Terminal:</h5>
           <div id="console" class="log-box"></div>
         </div>
 
@@ -370,7 +378,7 @@
           </section>
           <br>
           <section class="console-wrapper flex-fill">
-            <h5>ΛΞ's Vault: <span class="expandable" onclick="togglePanel('vaultInventoryContent')">▲▼ | Open</span>
+            <h5>ΛΞ Vault: <span class="expandable" onclick="togglePanel('vaultInventoryContent')">▲▼ | Open</span>
             </h5>
             <div id="vaultInventoryContent" class="sidebar-inventory" style="display: block;"></div>
           </section>
@@ -426,6 +434,7 @@
         <hr>
         This is a passion project I work on in spare moments — not a full-time thing, just something I tinker with for fun. If you run into any bugs, have feedback or feature suggestions feel free to reach out on Discord: <strong>@m6344</strong>
       </p>
+      Game Last Updated: <span class="greyed-out" id="last-updated">Loading...</span></h>
     </div>
   </div>
   
@@ -460,6 +469,7 @@
 
   <script src="./js/main.js" defer></script>
   <script src="./js/trade_contracts.js" defer></script>
+  <script src="./js/warp.js" defer></script>
 
   <link rel="shortcut icon" href="images/Fav.png">
   <link rel="icon" type="image/png" sizes="32x32" href="images/Fav.png">

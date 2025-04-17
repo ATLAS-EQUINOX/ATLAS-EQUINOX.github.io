@@ -1,4 +1,3 @@
-let warpFuelCostTotal = 0;
 let warpAbortLogged = false;
 let isWarping = false;
 let tradeTimestamps = [];
@@ -117,27 +116,36 @@ const RESOURCE_DATA = {
   },
   Fuel: {
     base: 90, // Critical to operations, regulated
-    volatility: 0.03,
+    volatility: 0.02,
   },
 };
 
 const SYSTEM_NAMES = [
-  // Real systems
-  "Sol",
+  "55 Cancri",
   "Alpha Centauri",
-  "Proxima Centauri",
+  "Altair",
   "Barnard's Star",
-  "Sirius",
-  "Vega",
-  "Tau Ceti",
-  "Epsilon Eridani",
-  "TRAPPIST-1e",
-  "Kepler-452b",
-  "Luyten's Star",
-  "Gliese 581",
-  "Wolf 359",
-  "Ross 128",
   "Beta Pictoris",
+  "Epsilon Eridani",
+  "Fomalhaut",
+  "Gliese 581",
+  "Gliese 667 C",
+  "HD 40307",
+  "Kapteyn's Star",
+  "Kepler-22b",
+  "Kepler-442b",
+  "Kepler-452b",
+  "Lalande 21185",
+  "Luyten's Star",
+  "Proxima Centauri",
+  "Ross 128",
+  "Sirius",
+  "Sol",
+  "Tau Ceti",
+  "TRAPPIST-1e",
+  "Vega",
+  "Wolf 359",
+  "YZ Ceti"
 ];
 
 const SPECIALIZATION_EFFECTS = {
@@ -151,154 +159,68 @@ const SPECIALIZATION_EFFECTS = {
 };
 
 const SYSTEM_SPECIALIZATIONS = {
-  "Sol": ["Organics", "Metals", "Ice"],
-  "Alpha Centauri": ["Metals", "Fuel"],
-  "Proxima Centauri": ["Rare Earths", "Ice"],
-  "Barnard's Star": ["Ice", "Gases"],
-  "Sirius": ["Fuel", "Metals"],
-  "Vega": ["Rare Earths", "Gases"],
-  "Tau Ceti": ["Organics", "Gases"],
-  "Epsilon Eridani": ["Fuel", "Metals"],
-  "TRAPPIST-1e": ["Organics", "Ice"],
-  "Kepler-452b": ["Rare Earths", "Organics"],
-  "Luyten's Star": ["Gases", "Ice"],
-  "Gliese 581": ["Fuel", "Rare Earths"],
-  "Wolf 359": ["Metals", "Gases"],
-  "Ross 128": ["Organics", "Metals"],
-  "Beta Pictoris": ["Fuel", "Ice", "Gases"]
+  "55 Cancri": ["Rare Earths"],
+  "Alpha Centauri": ["Metals"],
+  "Altair": ["Ice"],
+  "Barnard's Star": ["Gases"],
+  "Beta Pictoris": ["Fuel"],
+  "Epsilon Eridani": ["Fuel"],
+  "Fomalhaut": ["Organics"],
+  "Gliese 581": ["Rare Earths"],
+  "Gliese 667 C": ["Gases"],
+  "HD 40307": ["Metals"],
+  "Kapteyn's Star": ["Ice"],
+  "Kepler-22b": ["Gases"],
+  "Kepler-442b": ["Ice"],
+  "Kepler-452b": ["Organics"],
+  "Lalande 21185": ["Fuel"],
+  "Luyten's Star": ["Gases"],
+  "Proxima Centauri": ["Ice"],
+  "Ross 128": ["Metals"],
+  "Sirius": ["Fuel"],
+  "Sol": ["Organics"],
+  "Tau Ceti": ["Organics"],
+  "TRAPPIST-1e": ["Ice"],
+  "Vega": ["Rare Earths"],
+  "Wolf 359": ["Metals"],
+  "YZ Ceti": ["Fuel"]
 };
 
 
 
 const WARP_GRAPH = {
-  Sol: {
-    "Alpha Centauri": 12,
-    "Barnard's Star": 9,
-    "Lalande 21185": 15
-  },
-  "Alpha Centauri": {
-    Sol: 12,
-    "Proxima Centauri": 6,
-    "Tau Ceti": 10,
-    "Luhman 16": 14
-  },
-  "Proxima Centauri": {
-    "Alpha Centauri": 6,
-    "TRAPPIST-1e": 11,
-    "WISE 0855−0714": 18
-  },
-  "Barnard's Star": {
-    Sol: 9,
-    Sirius: 13,
-    "Lacaille 9352": 8
-  },
-  Sirius: {
-    "Barnard's Star": 13,
-    Vega: 10,
-    "Tau Ceti": 16,
-    Altair: 7
-  },
-  "Tau Ceti": {
-    "Alpha Centauri": 10,
-    Sirius: 16,
-    "Epsilon Eridani": 5,
-    "Delta Pavonis": 9
-  },
-  "Epsilon Eridani": {
-    "Tau Ceti": 5,
-    "Kepler-452b": 14,
-    "Lalande 21185": 8
-  },
-  "TRAPPIST-1e": {
-    "Proxima Centauri": 11,
-    "Gliese 581": 6,
-    "Kapteyn's Star": 13
-  },
-  "Kepler-452b": {
-    "Epsilon Eridani": 14,
-    "Beta Pictoris": 7,
-    "Ross 614": 10
-  },
-  Vega: {
-    Sirius: 10,
-    "Wolf 359": 6,
-    Altair: 5
-  },
-  "Wolf 359": {
-    Vega: 6,
-    "Ross 128": 4,
-    "Lacaille 9352": 7
-  },
-  "Ross 128": {
-    "Wolf 359": 4,
-    "Beta Pictoris": 8
-  },
-  "Beta Pictoris": {
-    "Ross 128": 8,
-    "Kepler-452b": 7,
-    Fomalhaut: 11
-  },
-  "Gliese 581": {
-    "TRAPPIST-1e": 6,
-    "Luyten's Star": 5,
-    "Kapteyn's Star": 12
-  },
-  "Luyten's Star": {
-    "Gliese 581": 5,
-    "EZ Aquarii": 9
-  },
-  "Kapteyn's Star": {
-    "TRAPPIST-1e": 13,
-    "Gliese 581": 12,
-    "Groombridge 34": 10
-  },
-  "Lalande 21185": {
-    Sol: 15,
-    "Epsilon Eridani": 8,
-    "Lacaille 9352": 6
-  },
-  "Lacaille 9352": {
-    "Barnard's Star": 8,
-    "Wolf 359": 7,
-    "Lalande 21185": 6,
-    "Ross 614": 5
-  },
-  "Ross 614": {
-    "Kepler-452b": 10,
-    "Lacaille 9352": 5,
-    "Groombridge 34": 8
-  },
-  Altair: {
-    Sirius: 7,
-    Vega: 5
-  },
-  Fomalhaut: {
-    "Beta Pictoris": 11,
-    "EZ Aquarii": 12
-  },
-  "EZ Aquarii": {
-    "Luyten's Star": 9,
-    Fomalhaut: 12
-  },
-  "Groombridge 34": {
-    "Kapteyn's Star": 10,
-    "Ross 614": 8
-  },
-  "WISE 0855−0714": {
-    "Proxima Centauri": 18
-  },
-  "Luhman 16": {
-    "Alpha Centauri": 14
-  },
-  "Delta Pavonis": {
-    "Tau Ceti": 9
-  }
+  "55 Cancri": ["Kepler-452b", "Beta Pictoris", "Vega"],
+  "Alpha Centauri": ["Sol", "Proxima Centauri", "Ross 128"],
+  "Altair": ["Fomalhaut", "Vega", "YZ Ceti"],
+  "Barnard's Star": ["Wolf 359", "Kapteyn's Star", "Tau Ceti"],
+  "Beta Pictoris": ["55 Cancri", "Kepler-442b", "Gliese 667 C"],
+  "Epsilon Eridani": ["TRAPPIST-1e", "Luyten's Star", "Gliese 581"],
+  "Fomalhaut": ["Altair", "Sirius", "TRAPPIST-1e"],
+  "Gliese 581": ["Epsilon Eridani", "Kapteyn's Star"],
+  "Gliese 667 C": ["Beta Pictoris", "Kepler-22b"],
+  "HD 40307": ["Lalande 21185", "Tau Ceti", "Kepler-22b"],
+  "Kapteyn's Star": ["Barnard's Star", "Gliese 581", "Lalande 21185"],
+  "Kepler-22b": ["HD 40307", "Gliese 667 C", "Kepler-442b"],
+  "Kepler-442b": ["Kepler-22b", "Beta Pictoris", "Wolf 359"],
+  "Kepler-452b": ["55 Cancri", "Luyten's Star", "Ross 128"],
+  "Lalande 21185": ["Kapteyn's Star", "HD 40307", "Sol"],
+  "Luyten's Star": ["Kepler-452b", "Epsilon Eridani"],
+  "Proxima Centauri": ["Alpha Centauri", "Tau Ceti"],
+  "Ross 128": ["Alpha Centauri", "Kepler-452b"],
+  "Sirius": ["Fomalhaut", "Sol", "Vega"],
+  "Sol": ["Alpha Centauri", "Sirius", "Lalande 21185"],
+  "Tau Ceti": ["Barnard's Star", "HD 40307", "Proxima Centauri"],
+  "TRAPPIST-1e": ["Epsilon Eridani", "Fomalhaut"],
+  "Vega": ["Sirius", "Altair", "55 Cancri"],
+  "Wolf 359": ["Barnard's Star", "Kepler-442b"],
+  "YZ Ceti": ["Altair"]
 };
 
 
 
+
 const FUEL_CAPACITY = 500;
-const TRAVEL_FUEL_COST = 0;
+const TRAVEL_FUEL_COST = 10;
 const npcCorporations = [
   "ÆTHRΛ GROUP",
   "Aegis Starfreight Inc.",
@@ -364,7 +286,7 @@ const npcCorporations = [
 let player = {
   location: SYSTEM_NAMES[Math.floor(Math.random() * SYSTEM_NAMES.length)],
   credits: 100,
-  fuel: 225,
+  fuel: 853,
   inventory: {},
   vault: {},
   shipments: [],
@@ -493,30 +415,55 @@ function hideDropdown(listId) {
   document.getElementById(listId).classList.add("d-none");
 }
 
-function getWarpPath(from, to) {
-  if (from === to) return [from];
+function getWarpPath(start, end) {
+  if (start === end) return [start];
 
-  const queue = [[from]];
-  const visited = new Set([from]);
+  const visited = new Set();
+  const queue = [[start]];
 
   while (queue.length > 0) {
     const path = queue.shift();
-    const current = path[path.length - 1];
+    const node = path[path.length - 1];
 
-    const neighbors = WARP_GRAPH[current];
-    if (!neighbors) continue;
+    if (node === end) return path;
 
-    for (const neighbor in neighbors) {
-      if (visited.has(neighbor)) continue;
-      const newPath = [...path, neighbor];
-      if (neighbor === to) return newPath;
-      queue.push(newPath);
-      visited.add(neighbor);
+    if (!visited.has(node)) {
+      visited.add(node);
+      const neighbors = Object.keys(WARP_GRAPH[node] || {});
+      for (const neighbor of neighbors) {
+        if (!visited.has(neighbor)) {
+          queue.push([...path, neighbor]);
+        }
+      }
     }
   }
 
-  return null; // No path found
+  // If no path found, just hop randomly to get somewhere
+  const systems = Object.keys(WARP_GRAPH);
+  if (systems.length > 0) {
+    const fallback = [start];
+    let current = start;
+    const visitedFallback = new Set([start]);
+
+    // Try to find *any* path
+    while (current !== end && visitedFallback.size < systems.length) {
+      const nextOptions = Object.keys(WARP_GRAPH[current] || {}).filter(n => !visitedFallback.has(n));
+      const next = nextOptions[0] || systems.find(s => !visitedFallback.has(s));
+      if (!next) break;
+      fallback.push(next);
+      visitedFallback.add(next);
+      current = next;
+    }
+
+    if (fallback[fallback.length - 1] !== end) fallback.push(end);
+    return fallback;
+  }
+
+  return [start, end];
 }
+
+
+
 
 
 function calculateInitialTrends() {
@@ -556,15 +503,22 @@ function calculateInitialTrends() {
 }
 
 function getFuelCostForPath(path) {
-  let fuel = 0;
-  for (let i = 0; i < path.length - 1; i++) {
-    const from = path[i];
-    const to = path[i + 1];
-    const segmentCost = WARP_GRAPH[from]?.[to] || 0;
-    fuel += segmentCost * 2.5; // 🚀 5x more fuel than raw distance
-  }
-  return fuel;
+  const perJumpCost = 10; // or 2.5, depending on desired balance
+  return (path.length - 1) * perJumpCost;
 }
+
+
+function checkMobileBlocker() {
+  if (window.innerWidth < 768) {
+    document.getElementById("mobile-blocker").style.display = "flex";
+  } else {
+    document.getElementById("mobile-blocker").style.display = "none";
+  }
+}
+
+window.addEventListener("load", checkMobileBlocker);
+window.addEventListener("resize", checkMobileBlocker);
+
 
 
 
@@ -819,7 +773,12 @@ function saveGameState(logToConsole = false) {
     const hh = now.getHours().toString().padStart(2, "0");
     const mm = now.getMinutes().toString().padStart(2, "0");
     const ss = now.getSeconds().toString().padStart(2, "0");
-    saveEl.textContent = `Last Saved: ${hh}:${mm}:${ss}`;
+  
+    const day = now.getDate().toString().padStart(2, "0");
+    const month = (now.getMonth() + 1).toString().padStart(2, "0");
+    const year = now.getFullYear();
+  
+    saveEl.textContent = `${hh}:${mm}:${ss} on ${day}/${month}/${year}`;
   }
 }
 
@@ -945,7 +904,7 @@ function populateSelectors() {
         travelBtn.innerText = "No Route";
       } else if (destination === player.location) {
         travelBtn.disabled = true;
-        travelBtn.innerText = "N/A";
+        travelBtn.innerText = "Current";
       } else {
         const hops = path.length - 1;
         travelBtn.disabled = false;
@@ -1052,7 +1011,7 @@ function toggleTravelButton() {
 
   if (selected === player.location) {
     btn.disabled = true;
-    btn.innerText = "N/A";
+    btn.innerText = "Current";
   } else {
     const path = getWarpPath(player.location, selected);
     if (!path) {
@@ -1991,6 +1950,7 @@ function updateStorageUsage() {
 
 function updateUI() {
   updateLocationUI();
+  updateMarketOverviewTitle()
   updateCreditsUI();
   updateFuelUI();
   updateInventoryDisplay();
@@ -2060,11 +2020,15 @@ function updateMarketTable() {
 
 
   function formatEstimate(val, hops) {
-    if (hops === null || hops > 4) return "∅";
-    if (hops <= 1) return val.toFixed(2);
-    if (hops === 2) return val.toFixed(1);
-    if (hops === 3) return Math.round(val).toString();
-    return `${Math.round(val / 10.34) * 10}`;
+    if (hops === null || hops > 20) return "∅";
+  
+    if (hops <= 4) return val.toFixed(2);         // Precise for local
+    if (hops === 6) return val.toFixed(1);        // Slightly rounded
+    if (hops <= 10) return Math.round(val).toString(); // Whole numbers
+    if (hops <= 12) return `${Math.round(val / 5) * 5}`; // Round to nearest 5
+    if (hops <= 14) return `${Math.round(val / 10) * 10}`; // Nearest 10
+    if (hops <= 17) return `${Math.round(val / 25) * 25}`; // Nearest 25
+    return `${Math.round(val / 50) * 50}`;         // Heavily rounded
   }
 
   rows.forEach(({ system, prices }) => {
@@ -2145,6 +2109,11 @@ function updateLocationUI() {
   if (el) el.textContent = player.location;
 }
 
+function updateMarketOverviewTitle() {
+  const el = document.getElementById("location2");
+  if (el) el.textContent = player.location;
+}
+
 function updateCreditsUI() {
   const el = document.getElementById("credits");
   if (el) el.textContent = player.credits.toFixed(2);
@@ -2152,7 +2121,7 @@ function updateCreditsUI() {
 
 function updateFuelUI() {
   const el = document.getElementById("fuel");
-  if (el) el.textContent = player.fuel;
+  if (el) el.textContent = parseFloat(player.fuel.toFixed(2));
 }
 
 function updateMarketHeading() {
@@ -2190,45 +2159,41 @@ function beginWarpStep(hopIndex) {
 
   const from = warpTargetPath[hopIndex - 1];
   const to = warpTargetPath[hopIndex];
-  const travelTime = Math.floor(Math.random() * 2000) + 3000;
+  const variation = 2 + (Math.random() * 0.1 - 0.05); // 0.95 to 1.05
+  const segmentFuelCost = parseFloat((TRAVEL_FUEL_COST * variation).toFixed(2));
 
-  const segmentFuelCost = (WARP_GRAPH[from]?.[to] || 0) * 2.5;
 
   if (player.fuel < segmentFuelCost) {
-    log(`Warp to ${to} failed: Insufficient fuel.`);
+    log(`Warp aborted due to insufficient fuel. Holding at ${from}.`);
+    player.location = from; // stay at current
+    document.getElementById("warp-overlay").classList.add("d-none");
+    disableTradeControls(false);
+    isWarping = false;
+    updateUI();
     return;
   }
 
-
+  const travelTime = Math.floor(Math.random() * 500) + 300;
   isWarping = true;
 
-  const overlay = document.getElementById("warp-overlay");
-  const route = document.getElementById("warp-route");
-  const timer = document.getElementById("warp-timer");
-  const progressBar = document.getElementById("warp-progress-bar");
+  if (hopIndex === 1) {
+    document.getElementById("warp-overlay").classList.remove("d-none");
+    disableTradeControls(true);
+  }
 
+  // UI progress
+  const progressBar = document.getElementById("warp-progress-bar");
   const totalHops = warpTargetPath.length - 1;
   const percent = Math.floor(((hopIndex - 1) / totalHops) * 100);
   progressBar.style.width = `${percent}%`;
   progressBar.textContent = `${percent}%`;
-  progressBar.setAttribute("aria-valuenow", percent);
-
-  if (overlay.classList.contains("d-none")) {
-    overlay.classList.remove("d-none");
-    disableTradeControls(true);
-  }
-
-  route.textContent = `Warping: ${from} → ${to} (${segmentFuelCost}) — Step ${hopIndex} of ${totalHops}`;
-  log(`Initiating warp to ${to}...`);
+  progressBar.setAttribute("aria-valuenow", percent.toString());
+  document.getElementById("warp-route").textContent = `Warping: ${from} → ${to} — Step ${hopIndex} of ${totalHops}`;
 
   setTimeout(() => {
-
     if (warpAborted) {
-      if (!warpAbortLogged) {
-        log(`Warp aborted mid-route. Holding at ${player.location}.`);
-        warpAbortLogged = true;
-      }
-      overlay.classList.add("d-none");
+      log(`Warp aborted. Holding at ${player.location}.`);
+      document.getElementById("warp-overlay").classList.add("d-none");
       disableTradeControls(false);
       isWarping = false;
       return;
@@ -2237,26 +2202,28 @@ function beginWarpStep(hopIndex) {
     player.location = to;
     player.fuel -= segmentFuelCost;
     flash("fuel");
-    log(`Arrived at ${to}. Remaining fuel: ${player.fuel}ᶜ`);
+    log(`Arrived at ${to}. Remaining fuel: ${player.fuel.toFixed(2)}ᶜ`);
     updateUI();
 
     if (to === warpFinalDest) {
       progressBar.style.width = "100%";
       progressBar.textContent = "100%";
       progressBar.setAttribute("aria-valuenow", "100");
-
       setTimeout(() => {
-        overlay.classList.add("d-none");
+        document.getElementById("warp-overlay").classList.add("d-none");
         disableTradeControls(false);
         log("Warp complete.");
         toggleTravelButton();
         isWarping = false;
-      }, 1000);
+      }, 500);
     } else {
       beginWarpStep(hopIndex + 1);
     }
   }, travelTime);
 }
+
+
+
 
 
 
@@ -2336,8 +2303,12 @@ function travel() {
   const selectedSystem = document.getElementById("travelSearch").value;
   if (!selectedSystem || selectedSystem === player.location) return;
 
+  // ✅ Calculate the warp route here
   const route = getWarpPath(player.location, selectedSystem);
-  if (!route || route.length === 0) return;
+  if (!route || route.length === 0) {
+    log("No valid warp path found.");
+    return;
+  }
 
   warpTargetPath = route;
   warpFinalDest = selectedSystem;
@@ -2345,13 +2316,11 @@ function travel() {
   const hops = route.length - 1;
   const fuelCost = getFuelCostForPath(route);
 
-  // 🛰️ Update all modal fields
-  document.getElementById("warpRouteDisplay").textContent = `From: ${player.location} To: ${selectedSystem}`;
+  document.getElementById("warpRouteDisplay").textContent = `From: ${player.location} → ${selectedSystem}`;
   document.getElementById("warpFullPath").textContent = route.join(" ➜ ");
   document.getElementById("warpHopCount").textContent = hops;
-  document.getElementById("warpFuelEstimate").textContent = fuelCost;
+  document.getElementById("warpFuelEstimate").textContent = fuelCost.toFixed(2);
 
-  // Show the warp confirmation modal
   document.getElementById("warpModal").style.display = "block";
 }
 
@@ -2360,24 +2329,26 @@ function travel() {
 
 
 
+
+
 function confirmWarp() {
   if (!warpTargetPath || warpTargetPath.length === 0) return;
+  warpAborted = false;
+  warpAbortLogged = false;
+  isWarping = true;
 
   document.getElementById("warpModal").style.display = "none";
-
-  // ✅ Show overlay ONCE at the start of the full warp
-  const overlay = document.getElementById("warp-overlay");
-  overlay.classList.remove("d-none");
+  document.getElementById("warp-overlay").classList.remove("d-none");
 
   const progressBar = document.getElementById("warp-progress-bar");
   progressBar.style.width = "0%";
   progressBar.textContent = "0%";
   progressBar.setAttribute("aria-valuenow", "0");
-  warpAborted = false;
-  disableTradeControls(true); // Disable trading during warp
-  
-  beginWarpStep(1); // Start from the first hop
+
+  disableTradeControls(true);
+  beginWarpStep(1);
 }
+
 
 
 
@@ -2790,10 +2761,10 @@ window.onload = function () {
   for (let i = 1; i < 4; i++) generateContract();
   renderAvailableContracts();
   setTimeout(hideLoadingOverlay, 1000);
-  setInterval(() => {
-    const count = getTradesLastMinute();
-    document.getElementById("tradeCount").textContent = count;
-  }, 1000);
+  //setInterval(() => {
+  //  const count = getTradesLastMinute();
+   // document.getElementById("tradeCount").textContent = count;
+ // }, 1000);
 
   // Remove old listeners from confirm button safely
 const oldConfirmBtn = document.getElementById("confirmWarpBtn");

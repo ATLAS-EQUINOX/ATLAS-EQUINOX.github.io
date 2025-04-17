@@ -83,6 +83,33 @@ body, html {
   vertical-align: middle;
 }
 
+#mobile-blocker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #111;
+  color: #fff;
+  z-index: 9999;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.mobile-blocker-content {
+  max-width: 500px;
+}
+
+@media (max-width: 767px) {
+  #mobile-blocker {
+    display: flex;
+  }
+}
+
+
 
 #spreadTable th {
   background: transparent !important;
