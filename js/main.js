@@ -2773,17 +2773,16 @@ window.onload = function () {
     applySystemSpecializations(name);
   }
 
-
-
-
   simulateNpcBehavior();
   renderTaxSidebar();
   fetchLastUpdated()
+  
   setTimeout(() => {
     const overlay = document.getElementById("loadingOverlay");
     overlay.classList.add("hide");
     setTimeout(() => (overlay.style.display = "none"), 500); // Wait for fade to finish
   }, 1200);
+  
   document
   .getElementById("travelSearch")
   .addEventListener("change", toggleTravelButton);
@@ -2811,6 +2810,16 @@ document.getElementById("openAboutBtn").addEventListener("click", () => {
 document.getElementById("closeInfoBtn").addEventListener("click", () => {
   document.getElementById("AboutModal").style.display = "none";
 });
+
+document.getElementById("openHelpBtn").addEventListener("click", () => {
+  document.getElementById("HelpModal").style.display = "block";
+});
+document.getElementById("closeHelpBtn").addEventListener("click", () => {
+  document.getElementById("HelpModal").style.display = "none";
+});
+
+
+
 window.addEventListener("click", (e) => {
   const aboutModal = document.getElementById("AboutModal");
   if (e.target == aboutModal) {

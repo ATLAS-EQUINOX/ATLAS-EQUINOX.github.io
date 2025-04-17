@@ -35,10 +35,14 @@
   
     <div class="nav-links">
       <div class="nav-separator"></div>
-      
+
       
       <button id="openLeaderboardBtn"><i class="fa fa-trophy"></i> | NPC Leaderboard</button>
       <div class="nav-separator"></div>
+      <button id="openHelpBtn"><i class="fa fa-question-circle" aria-hidden="true"></i> | Help</button>
+      <div class="nav-separator"></div>
+      
+
       <button onclick="saveGameState(logToConsole = true)"><i class="fa fa-save"></i> | Save Game</button>
       <button onclick="resetGameState()"><i class="fa fa-trash-o"></i> | Reset Save</button>
       <div class="nav-separator"></div>
@@ -148,6 +152,46 @@
 
   </div>
 </div>
+
+
+<div id="HelpModal" class="modal" style="display: none;">
+  <div class="modal-content large-modal">
+    <span id="closeHelpBtn" class="close">&times;</span>
+
+    <h3>ΛTLΛS | ΞQUINOX™ - Help</h3>
+
+    <!-- Welcome Section -->
+    <section id="helpSection">
+      <p>Welcome to ΛΞ, Intern-324234231.</p>
+      <p>You’ve just been assigned to Atlas Equinox's remote trading interface. Your mission is to grow company profits by buying low, selling high, managing logistics, and navigating volatile interstellar markets across multiple systems.</p>
+
+      <hr>
+
+      <h4>Basic Gameplay</h4>
+      <ul>
+        <li><strong>Buy Resources:</strong> Use the Buy panel to purchase materials from the selected system. Prices are dynamic and based on supply and demand.</li>
+        <li><strong>Sell Resources:</strong> Sell goods from your inventory at systems offering favorable prices. Export taxes may apply.</li>
+        <li><strong>Storage:</strong> You can transfer materials to your Vault (with a 30-second transit time).</li>
+        <li><strong>Travel:</strong> Warp between systems to find the best trade opportunities. Fuel costs and travel times apply.</li>
+      </ul>
+
+      <h4>Logistics & Inventory</h4>
+      <ul>
+        <li><strong>Incoming Shipments:</strong> Purchased resources arrive after a short delay. Monitor their ETA in the Logistics tab.</li>
+        <li><strong>Vault:</strong> Long-term storage for overflow materials. Accessible via the Logistics tab.</li>
+        <li><strong>Contracts:</strong> Earn bonus credits by accepting time-sensitive delivery missions in the Contracts tab.</li>
+      </ul>
+
+      <h4>Market Mechanics</h4>
+      <ul>
+        <li>Prices fluctuate based on recent trades, scarcity, and supply/demand levels.</li>
+        <li>Each system specializes in certain resources, which affects pricing and availability.</li>
+        <li>NPC corporations also trade, influencing the market with their own strategies.</li>
+      </ul>
+    </section>
+  </div>
+</div>
+
 
 
 
@@ -374,16 +418,17 @@
   </div>
 
   <div id="devLogModal" class="modal2warp" style="display: none;">
-    <div class="modal-content galactic-style width:400px">
+    <div class="modal-content galactic-style" style="width: 400px;">
       <span id="closeDevLogBtn" class="close">&times;</span>
-      <h3>Bugs or suggestions etc</h3>
-      <hr>
-      <p><strong>Discord:</strong> <code>m6344</code></p>
-
-      <p><strong>GitHub:</strong> <a href="https://github.com/ATLAS-EQUINOX/ATLAS-EQUINOX.github.io" target="_blank">https://github.com/ATLAS-EQUINOX/ATLAS-EQUINOX.github.io</a></p>
-      
+      <h5>Hi</h5>
+      <p>
+        Thanks for checking out the game!
+        <hr>
+        This is a passion project I work on in spare moments — not a full-time thing, just something I tinker with for fun. If you run into any bugs, have feedback or feature suggestions feel free to reach out on Discord: <strong>@m6344</strong>
+      </p>
     </div>
   </div>
+  
   
 
   <div id="warpModal" class="modal2warp">
@@ -418,6 +463,7 @@
 
   <link rel="shortcut icon" href="images/Fav.png">
   <link rel="icon" type="image/png" sizes="32x32" href="images/Fav.png">
+
 
   <!--<div> Icons made by <a href="https://www.flaticon.com/authors/artifex" title="Artifex"> Artifex 
   </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>-->
