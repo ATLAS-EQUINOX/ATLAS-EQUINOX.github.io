@@ -59,7 +59,7 @@ const RESOURCE_DATA = {
     volatility: 0.01,
   },
   Water: {
-    base: 60, // Scarce and essential off-Earth
+    base: 20, // Scarce and essential off-Earth
     volatility: 0.03,
   },
   Uranium: {
@@ -115,7 +115,7 @@ const RESOURCE_DATA = {
     volatility: 0.015,
   },
   Fuel: {
-    base: 90, // Critical to operations, regulated
+    base: 10, // Critical to operations, regulated
     volatility: 0.02,
   },
 };
