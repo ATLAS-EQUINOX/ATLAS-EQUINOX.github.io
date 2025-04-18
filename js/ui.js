@@ -158,60 +158,6 @@ function populateSelectors() {
 
 
 
-function updateLeaderboard() {
-  const tbody = document.getElementById("leaderboardBody");
-  if (!tbody) return;
-  tbody.innerHTML = ""; // Clear existing rows
-
-  const leaderboard = [
-    {
-      name: "ΛTLΛS | ΞQUINOX™",
-      netWorth: player.credits + calculateInventoryValue(player.inventory),
-      credits: player.credits,
-      inventoryValue: calculateInventoryValue(player.inventory),
-      topTrade: getTopTrade(player.inventory),
-      tradeCount: player.shipments?.length || 0,
-      lastTrade: getLastTradeTime(player),
-      location: player.location,
-      inTransit: "No",
-    },
-    ...Object.values(corporations).map((corp) => {
-      const inventoryValue = calculateInventoryValue(corp.inventory);
-      const netWorth = corp.credits + inventoryValue;
-      return {
-        name: corp.name,
-        netWorth,
-        credits: corp.credits,
-        inventoryValue,
-        topTrade: getTopTrade(corp.inventory),
-        tradeCount: corp.shipments?.length || 0,
-        lastTrade: getLastTradeTime(corp),
-        location: corp.location,
-        inTransit: corp.destination ? "Yes" : "No",
-      };
-    }),
-  ].sort((a, b) => b.netWorth - a.netWorth);
-
-  leaderboard.forEach((corp, i) => {
-    const tr = document.createElement("tr");
-
-    // Highlight player row
-    if (corp.name === "ΛTLΛS | ΞQUINOX™") {
-      tr.classList.add("player-row");
-    }
-
-    tr.innerHTML = `
-              <td>${i + 1}</td>
-              <td>${corp.name}</td>
-              <td>${corp.netWorth.toFixed(2)}ᶜ</td>
-              <td>${corp.credits.toFixed(2)}</td>
-              <td>${corp.inventoryValue.toFixed(2)}</td>
-          `;
-
-    tbody.appendChild(tr);
-  });
-}
-
 function updateRefuelButton() {
   const refuelBtn = document.getElementById("refuelButton");
   const fuelPrice = systems[player.location]?.prices?.Fuel ?? 10;
@@ -523,7 +469,7 @@ function processAndRenderShipments() {
   if (title) {
     const count = player.shipments.length;
     title.innerHTML =
-      `Incoming Shipments:` +
+      `Shipments:` +
       (count > 0 ? ` <span class="text-info">${count}</span>` : "");
   }
   const sortedShipments = [...player.shipments].sort((a, b) => a.time - b.time);
@@ -532,7 +478,7 @@ function processAndRenderShipments() {
     .querySelector("#shipments")
     .closest("section");
   if (player.shipments.length === 0) {
-    shipmentsList.innerHTML = `<li><span class="text-muted small">No incoming shipments.</span></li>`;
+    shipmentsList.innerHTML = `<li><span class="text-muted small">No shipments.</span></li>`;
   } else {
     shipmentSection.style.display = "block";
     shipmentsList.innerHTML = topThree

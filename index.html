@@ -44,19 +44,11 @@
     </div>
   
     <div class="nav-links">
-
-
-      
-      <button id="openLeaderboardBtn"><i class="fa fa-trophy"></i> | NPC Leaderboard</button>
+      <button id="openHelpBtn"><i class="fa fa-question-circle" aria-hidden="true"></i></button>
+      <button onclick="saveGameState(logToConsole = true)"><i class="fa fa-save"></i></button>
+      <button onclick="resetGameState()"><i class="fa fa-trash-o"></i></button>
       <div class="nav-separator"></div>
-      <button id="openHelpBtn"><i class="fa fa-question-circle" aria-hidden="true"></i> | Help</button>
-      <div class="nav-separator"></div>
-      
-
-      <button onclick="saveGameState(logToConsole = true)"><i class="fa fa-save"></i> | Save Game</button>
-      <button onclick="resetGameState()"><i class="fa fa-trash-o"></i> | Reset Save</button>
-      <div class="nav-separator"></div>
-      <button id="openDevLogBtn"><i class="fa fa-code" aria-hidden="true"></i> | Development</button>
+      <button id="openDevLogBtn"><i class="fa fa-code" aria-hidden="true"></i></button>
 
     </div>
   </nav>
@@ -86,28 +78,7 @@
 
 
 
-  <!-- Enhanced Leaderboard Modal -->
-  <div id="leaderboardModal" class="modal">
-    <div class="modal-content">
-      <span id="closeLeaderboardBtn" class="close">&times;</span>
-      <h2></i>Leaderboard</h2>
-      <div class="leaderboard-scroll-container">
-        <table id="leaderboardTable" class="table table-dark table-striped">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Corporation:</th>
-              <th>Net Worth (Credits + Stock):</th>
-              <th>Credits:</th>
-              <th>Stock Value:</th>
-            </tr>
-          </thead>
-          <tbody id="leaderboardBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
+ 
 <div id="HelpModal" class="modal" style="display: none;">
   <div class="modal-content large-modal">
     <span id="closeHelpBtn" class="close">&times;</span>
@@ -142,7 +113,7 @@
 
       <h4>Logistics & Inventory</h4>
       <ul>
-        <li><strong>Incoming Shipments:</strong> Purchased resources arrive after a short delay. Monitor their ETA in the Logistics tab.</li>
+        <li><strong>Shipments:</strong> Purchased resources arrive after a short delay. Monitor their ETA in the Logistics tab.</li>
         <li><strong>Vault:</strong> Long-term storage for overflow materials. Accessible via the Logistics tab.</li>
         <li><strong>Contracts:</strong> Earn bonus credits by accepting time-sensitive delivery missions in the Contracts tab.</li>
       </ul>
@@ -222,10 +193,13 @@
         <select id="tradeResourceSelect" class="form-select mb-2"></select>
       
         <input type="number" id="tradeAmount" maxlength="3" min="1" class="form-control mb-2" value="5" placeholder="Amount" />
-        <small><text> ~</text><span id="buybreakdown">~</span><span style="font-size: 0.55rem; color: #dc3545;">  (Tax-Excluded)</span></small><br>
+        
         <span id="sellbreakdown" style="display: none;">~</span>
+
+        <div style="text-align: center;"><small><text> ~</text><span id="buybreakdown">~ </span>   <span style="font-size: 0.55rem; color: #dc3545;"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> | Estimate</span></small><br></div>
       
         <div class="d-flex gap-2">
+          
           <button class="btn btn-success w-50" onclick="buyMaterial()">Buy</button>
           <button class="btn btn-danger w-50" onclick="sellMaterial()">Sell</button>
         </div>
@@ -322,10 +296,10 @@
       <!-- Tab Navigation -->
       <ul class="nav nav-tabs" id="logisticsTabs" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="logistics-tab" data-bs-toggle="tab" data-bs-target="#logistics"
+          <button class="nav-link active mb-0" id="logistics-tab" data-bs-toggle="tab" data-bs-target="#logistics"
             type="button" role="tab">Logistics</button>
         </li>
-        <li class="nav-item" role="presentation">
+        <li class="nav-item mb-0" role="presentation">
           <button class="nav-link" id="contracts-tab" data-bs-toggle="tab" data-bs-target="#contracts" type="button"
             role="tab">Contracts</button>
         </li>
@@ -342,7 +316,7 @@
         <!-- Logistics Tab -->
         <div class="tab-pane fade show active" id="logistics" role="tabpanel">
           <section class="console-wrapper flex-fill">
-            <h5 id="shipmentsTitle">Incoming Shipments:</h5>
+            <h5 id="shipmentsTitle">Shipments:</h5>
             <ul id="shipments" class="shipment-list list-unstyled small"></ul>
           </section>
           <br>

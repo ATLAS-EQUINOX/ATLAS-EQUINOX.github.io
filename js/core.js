@@ -231,23 +231,6 @@ function initGame() {
   updateUI();
 }
 
-let lastRanks = {}; // Keep outside the function
-
-// Modal handlers
-document.getElementById("openLeaderboardBtn").addEventListener("click", () => {
-  updateLeaderboard();
-  document.getElementById("leaderboardModal").style.display = "block";
-});
-document.getElementById("closeLeaderboardBtn").addEventListener("click", () => {
-  document.getElementById("leaderboardModal").style.display = "none";
-});
-window.addEventListener("click", (e) => {
-  const modal = document.getElementById("leaderboardModal");
-  if (e.target == modal) {
-    modal.style.display = "none";
-  }
-});
-
 function updateUI() {
   updateLocationUI();
   updateMarketOverviewTitle();
