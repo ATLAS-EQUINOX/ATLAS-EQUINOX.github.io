@@ -89,7 +89,7 @@ Iridium: {
     volatility: 0.015,
 },
 Fuel: {
-    base: 10, // Critical to operations, regulated
+    base: 5, // Critical to operations, regulated
     volatility: 0.02,
 },
 };

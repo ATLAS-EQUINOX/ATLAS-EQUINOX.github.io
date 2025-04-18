@@ -490,9 +490,13 @@ function processAndRenderShipments() {
         const hms = `${hrs}h ${mins}m ${secs}s`;
         const color = s.internal ? "#17a2b8" : "#ffc107"; // teal for internal, yellow for others
 
-        const label = s.internal
-          ? `↔ ${s.amount}${UNIT} ${s.resource} (${s.from} → ${s.to})`
-          : `${s.id} | ${s.amount}${UNIT} ${s.resource}`;
+        let label = s.internal
+        ? `↔ ${s.amount}${UNIT} ${s.resource} (${s.from} → ${s.to})`
+        : `${s.id} | ${s.amount}${UNIT} ${s.resource}`;
+      
+        if (s.delayedByWarp) {
+          label += ` <span class="text-warning">(Delayed)</span>`;
+        }
 
         return `<li style="border-left: 4px solid ${color}; padding-left: 6px;">
         <div class="d-flex justify-content-between">

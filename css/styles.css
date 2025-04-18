@@ -273,14 +273,15 @@ body, html {
 }
 
 .specialized-cell::after {
-  content: "⭓"; /* You can change this to any symbol or emoji */
+  content: '⏣'; /* Unicode for alembic (flask) */
   position: absolute;
   top: 2px;
   right: 2px;
-  font-size: 0.5em;
-  color: #ffc107; /* golden sparkle */
+  font-size: 0.7em;
+  color: #ffc107;
   pointer-events: none;
 }
+
 
 
 .close {

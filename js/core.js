@@ -3,6 +3,10 @@ let isWarping = false;
 let tradeTimestamps = [];
 let warpAborted = false;
 
+var gameState = {
+  playerHighScore: 100,
+  // your other game state vars...
+};
 let gamePaused = false;
 
 let lastPrices = {};
@@ -104,6 +108,9 @@ function initGame() {
   document
   .getElementById("tradeAmount")
   .addEventListener("input", updateUI);
+
+  document.getElementById("travelSearch").addEventListener("change", toggleTravelButton);
+
 
 
 
@@ -244,6 +251,8 @@ function updateUI() {
   updateMarketHeading();
   updateMarketTable(); // big one: we'll optimize this next
   randomizeGlitchDelays();
+  updatePlayerNetWorth();
+  updateHighScoreDisplay();
 
   updateSpreadTable();
   const sel = document.getElementById("tradeResourceSelect");

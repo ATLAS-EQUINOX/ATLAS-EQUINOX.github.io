@@ -162,3 +162,62 @@ function getRandomShipmentDelay() {
   return Math.floor(delay);
 }
 
+
+function calculateStorageValue(storage) {
+  let total = 0;
+  for (const res in storage) {
+    const base = RESOURCE_DATA[res]?.base || 1;
+    total += storage[res].reduce((sum, [qty]) => sum + qty * base, 0);
+  }
+  return total;
+}
+
+function getPlayerNetWorth() {
+  const vaultValue = calculateStorageValue(player.vault);
+  const inventoryValue = calculateStorageValue(player.inventory);
+  return player.credits + vaultValue + inventoryValue;
+}
+
+function calculatePlayerNetWorth() {
+  let net = player.credits || 0;
+
+  if (Array.isArray(player.inventory)) {
+    for (const item of player.inventory) {
+      const price = getAverageMarketPrice(player.location, item.resource) || 0;
+      net += item.quantity * price;
+    }
+  }
+
+  if (Array.isArray(player.vault)) {
+    for (const item of player.vault) {
+      const price = getAverageMarketPrice(player.location, item.resource) || 0;
+      net += item.quantity * price;
+    }
+  }
+
+  return net;
+}
+
+
+function updatePlayerNetWorth() {
+  const netWorth = calculatePlayerNetWorth(); // you may already have this function
+
+  if (netWorth > gameState.playerHighScore) {
+    gameState.playerHighScore = netWorth;
+    updateHighScoreDisplay(); // trigger the UI update when it changes
+  }
+}
+
+function updateHighScoreDisplay() {
+  const el = document.getElementById("highScoreValue");
+  if (el) {
+    el.textContent = formatCredits(gameState.playerHighScore || 0);
+  }
+}
+
+
+function formatCredits(value) {
+  return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "ᶜ";
+}
+
+

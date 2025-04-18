@@ -50,7 +50,7 @@ function getWarpPath(start, end) {
 }
 
 function getFuelCostForPath(path) {
-  const perJumpCost = 10; // or 2.5, depending on desired balance
+  const perJumpCost = 5; // or 2.5, depending on desired balance
   return (path.length - 1) * perJumpCost;
 }
 
@@ -157,6 +157,26 @@ function confirmWarp() {
   warpAbortLogged = false;
   isWarping = true;
 
+  const hops = warpTargetPath.length - 1;
+  const delayMs = hops * 10000; // 10 seconds per hop
+
+  player.shipments.forEach((shipment) => {
+    if (!shipment.delivered && shipment.time > Date.now() && !shipment.internal) {
+      shipment.time += delayMs;
+      shipment.delayedByWarp = true;
+    }
+  });
+
+
+
+  const delayedCount = player.shipments.filter(s => s.delayedByWarp && !s.loggedDelay).length;
+  if (delayedCount > 0) {
+    log(`${delayedCount} incoming shipment${delayedCount > 1 ? "s" : ""} delayed by warp interference.`);
+    player.shipments.forEach(s => {
+      if (s.delayedByWarp) s.loggedDelay = true;
+    });
+  }
+
   document.getElementById("warpModal").style.display = "none";
   document.getElementById("warp-overlay").classList.remove("d-none");
 
@@ -168,6 +188,7 @@ function confirmWarp() {
   disableTradeControls(true);
   beginWarpStep(1);
 }
+
 
 function cancelWarp() {
   document.getElementById("warpModal").style.display = "none";

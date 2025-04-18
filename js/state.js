@@ -3,7 +3,7 @@ const FUEL_CAPACITY = 1000;
 const TRAVEL_FUEL_COST = 10 * (Math.random() * 0.5 + 0.75); // Random between 7.5-12.5
 
 let gameStartTime;
-
+let playerHighScore = 100;
 let player = {
   location: SYSTEM_NAMES[Math.floor(Math.random() * SYSTEM_NAMES.length)],
   credits: 100,
@@ -23,6 +23,7 @@ function saveGameState(logToConsole = false) {
     location: player.location,
     corporations: corporations,
     createdAt: gameStartTime || Date.now(), // 🕒 Save the timestamp
+    playerHighScore: playerHighScore
   };
   localStorage.setItem("atlasSave", JSON.stringify(state));
   if (logToConsole) log("Network Synced.");
@@ -66,14 +67,16 @@ function loadGameState() {
         corporations[name].inventory[res] = [];
       });
     });
-
+    updateHighScoreDisplay?.(); // if that function exists already
     showWelcomeModal(); // <-- First time player
     return;
   }
+  
 
   try {
     const state = JSON.parse(saved);
     gameStartTime = state.createdAt || Date.now();
+    playerHighScore = state.playerHighScore ?? 0;
     player.credits = state.credits ?? 1000;
     player.fuel = state.fuel ?? 100;
     player.location = state.location ?? "Sol";

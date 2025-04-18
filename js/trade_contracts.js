@@ -6,13 +6,26 @@ function generateContract(issuer = "ΛTLΛS | ΞQUINOX™") {
   const type = pickRandom(["delivery", "supply", "acquire"]);
   const resource = pickRandom(RESOURCE_TYPES);
   const destination = pickRandom(SYSTEM_NAMES.filter(s => s !== player.location));
-  const amount = randInt(50, 150);
+
+  // 📈 Net worth-based scaling — tuned for early game
+  const netWorth = getPlayerNetWorth();
+  let scale = 0.5;
+  if (netWorth > 500) scale = 0.75;
+  if (netWorth > 2_000) scale = 1;
+  if (netWorth > 10_000) scale = 1.5;
+  if (netWorth > 50_000) scale = 2;
+
+  // Scaled amount and reward
+  const baseAmount = randInt(5, 20); // Lowered for early game
+  const amount = Math.max(1, Math.floor(baseAmount * scale));
   const scarcity = 1 + (getScarcityModifier(resource) || 0);
   const urgency = 1.2 + Math.random() * 0.8;
   const risk = Math.random(); // 0.0 (safe) to 1.0 (high risk)
   const base = RESOURCE_DATA[resource].base;
   const reward = Math.floor(base * amount * (1 + scarcity + urgency + risk));
-  const duration = randInt(180000, 480000); // 3–8 min
+
+  // Scaled time limit
+  const duration = randInt(120000, 300000) * scale; // 2–5 min scaled
 
   const flavor = generateFlavorText(type, resource, destination);
 
@@ -31,6 +44,8 @@ function generateContract(issuer = "ΛTLΛS | ΞQUINOX™") {
     flavor
   });
 }
+
+
 
 function generateFlavorText(type, resource, destination) {
   switch (type) {
