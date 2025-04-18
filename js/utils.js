@@ -1,3 +1,4 @@
+var system;
 function cleanNumber(num) {
   return parseFloat(num.toFixed(2)); // rounds to 2 decimal places and removes trailing zeroes
 }

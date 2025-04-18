@@ -1,3 +1,4 @@
+var system;
 // --- helper: seeded PRNG from an integer seed ---
 function mulberry32(a) {
   return function() {
@@ -353,55 +354,61 @@ function sellAllOfResource(resource) {
  * Simulate what the new unit price would be
  * if you bought `amount` more at once.
  */
-function projectPostBuyPrice(systemName, resource, amount) {
-  const system = systems[systemName];
+function projectPostBuyPrice(location, resource, amount) {
+  const entry = systems[location]?.market?.[resource];
 
-  // 1️⃣ Guard missing market or zero supply
-  const market = system.market?.[resource];
-  if (!market || market.supply === 0) {
-    const fallback =
-      system.prices[resource] ?? getTimeSeededPrice(systemName, resource);
+  // If market is unavailable or has no supply, fallback to seeded price
+  if (!entry || entry.supply === 0) {
+    const fallback = systems[location]?.prices?.[resource] ?? getTimeSeededPrice(location, resource);
     return parseFloat(fallback.toFixed(2));
   }
 
-  // 2️⃣ Your existing projection logic
-  const timePrice = getTimeSeededPrice(systemName, resource);
-  const totalSys  = SYSTEM_NAMES.length;
-  const avail     = SYSTEM_NAMES.filter(
-    sys => systems[sys].market?.[resource]
-  ).length;
-  const scarcity  = 1 + ((totalSys - avail) / totalSys) * 0.3;
-  const rawBase   = timePrice * scarcity;
+  // Get base price using time seed
+  const timePrice = getTimeSeededPrice(location, resource);
 
-  const newDemand = market.demand + amount;
-  const ratio     = newDemand / market.supply;
-  let impacted    = rawBase * (
-    ratio > 1
-      ? 1 + (ratio - 1) * 0.01
-      : 1 - (1 - ratio) * 0.01
-  );
+  // Apply scarcity multiplier
+  const totalSys = SYSTEM_NAMES.length;
+  const avail = SYSTEM_NAMES.filter(sys => systems[sys].market?.[resource]).length;
+  const scarcity = 1 + ((totalSys - avail) / totalSys) * 0.3;
+  const rawBase = timePrice * scarcity;
 
+  // Simulate price change based on increased demand
+  const newDemand = entry.demand + amount;
+  const ratio = newDemand / entry.supply;
+  let impacted = rawBase * (ratio > 1
+    ? 1 + (ratio - 1) * 0.01
+    : 1 - (1 - ratio) * 0.01);
+
+  // Clamp final price
   const base = RESOURCE_DATA[resource].base;
   impacted = Math.max(base * 0.5, Math.min(base * 3, impacted));
 
   return parseFloat(impacted.toFixed(2));
 }
 
-
-
 function updateBuyBreakdown(res, amt) {
   if (!amt || !RESOURCE_DATA[res]) {
-    return document.getElementById("buybreakdown").textContent = "~";
+    document.getElementById("buybreakdown").textContent = "~";
+    return;
   }
-  // ← use projected price, not current
-  const unitPrice = projectPostBuyPrice(player.location, res, amt);
-  const taxRate   = systems[player.location].tariffs.importTaxRate || 0;
-  const tax       = unitPrice * amt * taxRate;
-  const total     = unitPrice * amt + tax;
+
+  const loc = player?.location;
+  const sys = systems?.[loc];
+
+  if (!loc || !sys) {
+    document.getElementById("buybreakdown").textContent = "~";
+    return; // ⛔ Prevent crash during warp
+  }
+
+  const unitPrice = projectPostBuyPrice(loc, res, amt);
+  const taxRate = sys.tariffs?.importTaxRate || 0;
+  const tax = unitPrice * amt * taxRate;
+  const total = unitPrice * amt + tax;
 
   document.getElementById("buybreakdown").textContent =
     `${total.toFixed(2)}ᶜ`;
 }
+
 
 
 

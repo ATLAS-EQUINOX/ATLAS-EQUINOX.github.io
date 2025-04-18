@@ -456,6 +456,39 @@
   <script src="./js/ui.js" defer></script>
   <script src="./js/core.js" defer></script>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const warpModal     = document.getElementById('warpModal');
+      const travelButton  = document.getElementById('travelButton');
+      const confirmBtn    = document.getElementById('confirmWarpBtn');
+      const cancelBtn     = document.getElementById('cancelWarpBtn');
+      const abortBtn      = document.getElementById('abortWarpBtn');
+
+      // 1) Travel → calculate route & show modal
+      travelButton.addEventListener('click', () => {
+        travel();                   // fills in path/fuel into the modal
+        warpModal.style.display = 'block';
+      });
+
+      // 2) Confirm → hide modal & start warp
+      confirmBtn.addEventListener('click', () => {
+        warpModal.style.display = 'none';
+        confirmWarp();
+      });
+
+      // 3) Cancel → hide modal, don’t warp
+      cancelBtn.addEventListener('click', () => {
+        warpModal.style.display = 'none';
+        cancelWarp();
+      });
+
+      // 4) Abort (mid‑warp) → fires your abort logic
+      abortBtn.addEventListener('click', () => {
+        abortWarp();
+      });
+    });
+  </script>
+
   <link rel="shortcut icon" href="images/Fav.png">
   <link rel="icon" type="image/png" sizes="32x32" href="images/Fav.png">
 

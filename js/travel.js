@@ -1,3 +1,4 @@
+var system;
 function getWarpPath(start, end) {
   if (start === end) return [start];
 

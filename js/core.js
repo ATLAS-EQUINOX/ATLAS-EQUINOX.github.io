@@ -216,6 +216,12 @@ function initGame() {
   );
   localStorage.setItem("atlasMarketData", JSON.stringify(marketDataCache));
   localStorage.setItem(TARIFF_CACHE_KEY, JSON.stringify(tariffCache));
+  
+  system = {
+    market:   systems,
+    player:   player,
+    warpGraph: WARP_GRAPH
+  };
 
   // Initialize UI
   calculateInitialTrends();

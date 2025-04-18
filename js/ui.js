@@ -1,3 +1,4 @@
+var system;
 function showWelcomeModal() {
   const welcomeModal = document.getElementById("AboutModal");
   if (welcomeModal) {

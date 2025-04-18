@@ -1,3 +1,4 @@
+var system;
 function simulateNpcBehavior() {
   Object.values(corporations).forEach((corp) => {
     // Complete warp if time is up
