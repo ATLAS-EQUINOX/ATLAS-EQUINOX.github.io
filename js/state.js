@@ -1,6 +1,8 @@
 const FUEL_CAPACITY = 1000;
 const TRAVEL_FUEL_COST = 10 * (Math.random() * 0.5 + 0.75); // Random between 7.5-12.5
 
+let gameStartTime;
+
 let player = {
   location: SYSTEM_NAMES[Math.floor(Math.random() * SYSTEM_NAMES.length)],
   credits: 100,

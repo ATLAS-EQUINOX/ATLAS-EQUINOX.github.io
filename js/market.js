@@ -304,37 +304,69 @@ function sellAllOfResource(resource) {
   updateUI();
 }
 
+function updateBuyBreakdown(res, amt) {
+  const price = systems[player.location]?.prices?.[res];
+  if (typeof price !== "number" || !amt) {
+    return document.getElementById("buybreakdown").textContent = "~";
+  }
+  document.getElementById("buybreakdown").textContent =
+    (price * amt).toFixed(2) + "ᶜ";
+}
+
+
+function updateSellBreakdown(res, amt) {
+  const price = systems[player.location]?.prices?.[res];
+  if (typeof price !== "number" || !amt) {
+    return document.getElementById("sellbreakdown").textContent = "~";
+  }
+  document.getElementById("sellbreakdown").textContent =
+    (price * amt).toFixed(2) + "ᶜ";
+}
+
+
 function buyMaterial() {
-  const res = document.getElementById("buyResourceSelect").value;
-  const amtInput = document.getElementById("buyAmount");
-  const amt = parseInt(amtInput.value);
+  const res = document.getElementById("tradeResourceSelect").value;
+  const amtInput = document.getElementById("tradeAmount");
+  const amt = parseInt(amtInput.value, 10);
   if (!amt || amt <= 0) return log("Invalid quantity.");
+
+  updateBuyBreakdown(res, amt);
+
+
+  if (!RESOURCE_DATA[res]) {
+    return log(`Unknown resource: ${res}`);
+  }
 
   const system = systems[player.location];
   const market = system.market[res];
-  if (!market)
+  if (!market) {
     return log(`${res} is not currently available in ${player.location}.`);
+  }
 
   const basePrice = system.prices[res];
   const { buyPrice } = getBuySellPrice(basePrice);
   const importTaxRate = system.tariffs?.importTaxRate || 0;
 
-  const unitCost = buyPrice * (1 + importTaxRate);
-  const totalCost = unitCost * amt;
+  // Show breakdown before confirmation
+  updateBuyBreakdown(res, amt, buyPrice, importTaxRate);
 
-  if (player.credits < totalCost) {
-    const maxAffordable = Math.floor(player.credits / unitCost);
-    if (maxAffordable > 0) {
-      amtInput.value = maxAffordable;
-      return log(
-        `Not enough credits. You can afford up to ${maxAffordable}x ${res}.`
-      );
-    }
-    return log("Not enough credits to buy any units.");
-  }
-
-  // ✅ Set the trade function
+  // Now set the pendingTrade
   pendingTrade = () => {
+    const unitCost = buyPrice * (1 + importTaxRate);
+    const totalCost = unitCost * amt;
+
+    if (player.credits < totalCost) {
+      const maxAffordable = Math.floor(player.credits / unitCost);
+      if (maxAffordable > 0) {
+        amtInput.value = maxAffordable;
+        return log(
+          `Not enough credits. You can afford up to ${maxAffordable}× ${res}.`
+        );
+      }
+      return log("Not enough credits to buy any units.");
+    }
+
+    // Deduct credits & queue shipment
     player.credits -= totalCost;
     player.shipments.push({
       id: `SHIP-${Date.now().toString().slice(-5)}`,
@@ -345,13 +377,15 @@ function buyMaterial() {
     });
 
     recentPlayerBuys[`${player.location}-${res}`] = Date.now();
-
     market.demand += amt;
 
+    // Recalculate price
     const ratio = market.demand / market.supply;
     const base = RESOURCE_DATA[res].base;
     let newPrice =
-      buyPrice * (ratio > 1 ? 1 + (ratio - 1) * 0.01 : 1 - (1 - ratio) * 0.01);
+      buyPrice * (ratio > 1
+        ? 1 + (ratio - 1) * 0.01
+        : 1 - (1 - ratio) * 0.01);
     system.prices[res] = parseFloat(
       Math.max(base * 0.5, Math.min(base * 3, newPrice)).toFixed(2)
     );
@@ -360,135 +394,63 @@ function buyMaterial() {
     updateUI();
   };
 
+  // Show the confirmation dialog / summary
   showTradeSummary("buy", res, amt, buyPrice);
 }
 
-function showTradeSummary(type, res, amt, price) {
-  const location = player.location;
-  const tariffs = systems[location]?.tariffs || {
-    importTaxRate: 0,
-    exportTaxRate: 0,
-  };
-
-  const baseTotal = price * amt;
-  const taxRate =
-    type === "buy" ? tariffs.importTaxRate : tariffs.exportTaxRate;
-  const taxAmount = baseTotal * taxRate;
-  const finalTotal =
-    type === "buy" ? baseTotal + taxAmount : baseTotal - taxAmount;
-
-  if (pendingTrade) {
-    pendingTrade();
-    pendingTrade = null;
-    saveGameState();
-
-    const action = type === "buy" ? "Purchased" : "Sold";
-    const taxLabel = "Tax";
-
-    log(
-      `${action} ${amt}${UNIT} of ${res} at ${price.toFixed(
-        2
-      )}ᶜ each (${taxLabel}: ${taxAmount.toFixed(2)}ᶜ)`
-    );
-
-    tradeTimestamps.push(Date.now());
-
-    let profitLossStr = "";
-    if (type === "sell") {
-      const inv = player.inventory[res];
-      const matched = inv.slice(0, amt);
-      const totalPaid = matched.reduce(
-        (sum, [qty, paid]) => sum + qty * paid,
-        0
-      );
-      const profit = finalTotal - totalPaid;
-      const profitColor = profit >= 0 ? "text-success" : "text-danger";
-      const profitLabel = profit >= 0 ? "Profit" : "Loss";
-      profitLossStr = `<span class="${profitColor}">${profitLabel}: ${profit.toFixed(
-        2
-      )}ᶜ</span>`;
-    } else {
-      profitLossStr = `<span class="text-success">Total: ${finalTotal.toFixed(
-        2
-      )}ᶜ</span>`;
-    }
-
-    logMarket(
-      `<span class="text-warning">ΛTLΛS | ΞQUINOX™</span> ${
-        type === "buy" ? "purchased" : "sold"
-      } ${amt}${UNIT} of ${res} in ${location} |
-        ${price.toFixed(
-          2
-        )}ᶜ each (Tax: <span class="text-danger">${taxAmount.toFixed(
-        2
-      )}ᶜ</span>, ${profitLossStr})`
-    );
-  }
-}
 
 function sellMaterial() {
-  const res = document.getElementById("sellResourceSelect").value;
-  const amt = parseInt(document.getElementById("sellAmount").value);
+  const res = document.getElementById("tradeResourceSelect").value;
+  const amt = parseInt(document.getElementById("tradeAmount").value, 10);
   if (!amt || amt <= 0) return log("Invalid quantity.");
 
-  let market = systems[player.location].market[res];
-  const priceExists = systems[player.location].prices?.[res];
-  let price = systems[player.location].prices?.[res] ?? RESOURCE_DATA[res].base;
 
-  // 🚀 If resource is unavailable, create market on-the-fly
-  if (!market) {
-    log(`ΛΞ started trade of ${res} in ${player.location}.`);
-    const base = RESOURCE_DATA[res].base;
-    price = base * 1.25;
+  updateSellBreakdown(res, amt);
 
-    // Create market entry
-    market = { supply: 0, demand: 0 };
-    systems[player.location].market[res] = market;
-    systems[player.location].prices[res] = price;
-
-    // 🧠 Save this new market to localStorage
-    const key = `${player.location}-${res}`;
-    const now = Date.now();
-
-    // Update availability
-    const availabilityCache = JSON.parse(
-      localStorage.getItem("atlasMarketAvailability") || "{}"
-    );
-    availabilityCache[key] = { available: true, timestamp: now };
-    localStorage.setItem(
-      "atlasMarketAvailability",
-      JSON.stringify(availabilityCache)
-    );
-
-    // Update market data
-    const marketDataCache = JSON.parse(
-      localStorage.getItem("atlasMarketData") || "{}"
-    );
-    marketDataCache[key] = { supply: 0, demand: 0 };
-    localStorage.setItem("atlasMarketData", JSON.stringify(marketDataCache));
+  if (!RESOURCE_DATA[res]) {
+    return log(`Unknown resource: ${res}`);
   }
 
-  const inv = player.inventory[res];
+  const system = systems[player.location];
+  let market = system.market[res];
+  let price = system.prices?.[res] ?? RESOURCE_DATA[res].base;
+
+  // If market doesn’t exist, create it
+  if (!market) {
+    log(`ΛΞ started trade of ${res} in ${player.location}.`);
+    price = RESOURCE_DATA[res].base * 1.25;
+    market = { supply: 0, demand: 0 };
+    system.market[res] = market;
+    system.prices[res] = price;
+
+    const key = `${player.location}-${res}`;
+    const now = Date.now();
+    const ac = JSON.parse(localStorage.getItem("atlasMarketAvailability") || "{}");
+    ac[key] = { available: true, timestamp: now };
+    localStorage.setItem("atlasMarketAvailability", JSON.stringify(ac));
+
+    const md = JSON.parse(localStorage.getItem("atlasMarketData") || "{}");
+    md[key] = { supply: 0, demand: 0 };
+    localStorage.setItem("atlasMarketData", JSON.stringify(md));
+  }
+
+  const inv = player.inventory[res] || [];
   const inventoryAmount = inv.reduce((sum, [qty]) => sum + qty, 0);
   if (inventoryAmount === 0) return log("No inventory to sell.");
 
-  const sellAmt = Math.min(amt, inventoryAmount);
+  const sellAmt = Math.min(rawAmt, inventoryAmount);
 
   const lastBuyTime = recentPlayerBuys[`${player.location}-${res}`];
   if (lastBuyTime && Date.now() - lastBuyTime < TRADE_COOLDOWN) {
-    const wait = Math.ceil(
-      (TRADE_COOLDOWN - (Date.now() - lastBuyTime)) / 1000
-    );
-    return log(
-      `${res} trading in ${player.location} is temporarily restricted. Wait ${wait}s.`
-    );
+    const wait = Math.ceil((TRADE_COOLDOWN - (Date.now() - lastBuyTime)) / 1000);
+    return log(`${res} trading in ${player.location} is restricted. Wait ${wait}s.`);
   }
 
-  pendingTrade = () => {
-    let toSell = sellAmt,
-      sold = 0,
-      totalPaid = 0;
+  // Show breakdown before confirmation
+  updateSellBreakdown(res, sellAmt, price);
 
+  pendingTrade = () => {
+    let toSell = sellAmt, sold = 0, totalPaid = 0;
     for (let i = 0; i < inv.length && toSell > 0; i++) {
       const [qty, paid] = inv[i];
       const take = Math.min(qty, toSell);
@@ -503,18 +465,118 @@ function sellMaterial() {
     player.credits += revenue;
     flash("credits");
 
-    // Add supply and adjust price if market was created or already existed
     market.supply += sold;
     const ratio = market.demand / market.supply;
     const base = RESOURCE_DATA[res].base;
     let newPrice =
-      price * (ratio > 1 ? 1 + (ratio - 1) * 0.01 : 1 - (1 - ratio) * 0.01);
-    newPrice = Math.max(base * 0.5, Math.min(base * 3, newPrice));
-    systems[player.location].prices[res] = parseFloat(newPrice.toFixed(2));
+      price * (ratio > 1
+        ? 1 + (ratio - 1) * 0.01
+        : 1 - (1 - ratio) * 0.01);
+    system.prices[res] = parseFloat(
+      Math.max(base * 0.5, Math.min(base * 3, newPrice)).toFixed(2)
+    );
 
     updateUI();
   };
 
   showTradeSummary("sell", res, sellAmt, price);
-  updateSellBreakdown();
 }
+
+
+function showTradeSummary(type, res, amt, price) {
+  const location = player.location;
+  const tariffs = systems[location]?.tariffs || {
+    importTaxRate: 0,
+    exportTaxRate: 0,
+  };
+
+  const baseTotal = price * amt;
+  const taxRate = type === "buy"
+    ? tariffs.importTaxRate
+    : tariffs.exportTaxRate;
+  const taxAmount = baseTotal * taxRate;
+  const finalTotal = type === "buy"
+    ? baseTotal + taxAmount
+    : baseTotal - taxAmount;
+
+  // 1) Update the breakdown spans immediately:
+  if (type === "buy") {
+    // B: span shows unit price, tax, total cost
+    updateBuyBreakdown(res, amt, price, tariffs.importTaxRate);
+    // Clear sell span
+    document.getElementById("sellbreakdown").textContent = "~";
+  } else {
+    // S: span shows unit price and revenue after tax
+    updateSellBreakdown(res, amt, price);
+    // Clear buy span
+    document.getElementById("buybreakdown").textContent = "~";
+  }
+
+  // 2) If there's a pending trade, finalize it
+  if (pendingTrade) {
+    pendingTrade();
+    pendingTrade = null;
+    saveGameState();
+
+    // 3) Log a clear, detailed message
+    if (type === "buy") {
+      log(
+        `Purchased ${amt}${UNIT} ${res} @ ${price.toFixed(
+          2
+        )}ᶜ each +${taxAmount.toFixed(2)}ᶜ tax → ${finalTotal.toFixed(
+          2
+        )}ᶜ total; credits left: ${player.credits.toFixed(2)}ᶜ.`
+      );
+    } else {
+      // calculate cost basis for profit/loss
+      const inv = player.inventory[res];
+      // find how much was paid for the oldest `amt` units
+      let remaining = amt, costSum = 0;
+      for (let [qty, paid] of inv) {
+        if (remaining <= 0) break;
+        const used = Math.min(qty, remaining);
+        costSum += used * paid;
+        remaining -= used;
+      }
+      const profit = finalTotal - costSum;
+      const sign = profit >= 0 ? "+" : "";
+      log(
+        `Sold ${amt}${UNIT} ${res} @ ${price.toFixed(
+          2
+        )}ᶜ each -${taxAmount.toFixed(2)}ᶜ tax → ${finalTotal.toFixed(
+          2
+        )}ᶜ; P/L: ${sign}${profit.toFixed(2)}ᶜ.`
+      );
+    }
+
+    tradeTimestamps.push(Date.now());
+
+    // 4) Push to market log
+    const actionWord = type === "buy" ? "purchased" : "sold";
+    const profitLossLabel = type === "sell"
+      ? (() => {
+          const inv = player.inventory[res];
+          let remaining = amt, costSum = 0;
+          for (let [qty, paid] of inv) {
+            if (remaining <= 0) break;
+            const used = Math.min(qty, remaining);
+            costSum += used * paid;
+            remaining -= used;
+          }
+          const profit = finalTotal - costSum;
+          const cls = profit >= 0 ? "text-success" : "text-danger";
+          const label = profit >= 0 ? "Profit" : "Loss";
+          return `<span class="${cls}">${label}: ${profit.toFixed(2)}ᶜ</span>`;
+        })()
+      : `<span class="text-success">Total: ${finalTotal.toFixed(2)}ᶜ</span>`;
+
+    logMarket(
+      `<span class="text-warning">ΛTLΛS | ΞQUINOX™</span> ${actionWord} ${amt}${UNIT} of ${res} in ${location} |
+        ${price.toFixed(2)}ᶜ each (Tax: <span class="text-danger">${taxAmount.toFixed(
+        2
+      )}ᶜ</span>, ${profitLossLabel})`
+    );
+  }
+}
+
+

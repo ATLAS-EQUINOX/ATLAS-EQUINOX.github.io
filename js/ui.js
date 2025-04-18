@@ -17,6 +17,26 @@ function populateCustomDropdown(listId, items, onClickHandler) {
   });
 }
 
+function populateWarpDropdown() {
+  const sel = document.getElementById("travelSearch");
+  if (!sel) {
+    console.error("populateWarpDropdown(): #travelSearch not found");
+    return;
+  }
+
+  // clear out any old options
+  sel.innerHTML = "";
+
+  // SYSTEM_NAMES is your array of all jump destinations
+  SYSTEM_NAMES.forEach((system) => {
+    const opt = document.createElement("option");
+    opt.value = system;
+    opt.textContent = system;
+    sel.appendChild(opt);
+  });
+}
+
+
 function createStyledInfoCard(message = "No data.", color = "#555") {
   const li = document.createElement("li");
   li.style.borderLeft = `4px solid ${color}`;
@@ -113,55 +133,29 @@ function toggleTravelButton() {
 }
 
 function populateSelectors() {
-  const travelSelect = document.getElementById("travelSearch");
-  const buySelect = document.getElementById("buyResourceSelect");
-  const sellSelect = document.getElementById("sellResourceSelect");
-
-  if (travelSelect) {
-    travelSelect.innerHTML = "";
-    SYSTEM_NAMES.forEach((system) => {
-      const opt = document.createElement("option");
-      opt.value = system;
-      opt.textContent = system;
-      travelSelect.appendChild(opt);
-    });
-    travelSelect.value = player.location;
-    toggleTravelButton();
-
-    // ✅ Attach warp route display here
-    travelSelect.addEventListener("change", () => {
-      const destination = travelSelect.value;
-      const travelBtn = document.getElementById("travelButton");
-      const path = getWarpPath(player.location, destination);
-
-      if (!path) {
-        travelBtn.disabled = true;
-        travelBtn.innerText = "No Route";
-      } else if (destination === player.location) {
-        travelBtn.disabled = true;
-        travelBtn.innerText = "Current";
-      } else {
-        const hops = path.length - 1;
-        travelBtn.disabled = false;
-        travelBtn.innerText = `Warp (${hops} Jump${hops !== 1 ? "s" : ""})`;
-      }
-    });
+  const sel = document.getElementById("tradeResourceSelect");
+  if (!sel) {
+    console.error("populateSelectors(): #tradeResourceSelect not found");
+    return;
   }
 
-  if (buySelect && sellSelect) {
-    RESOURCE_TYPES.forEach((res) => {
-      const optBuy = document.createElement("option");
-      optBuy.value = res;
-      optBuy.textContent = res;
-      buySelect.appendChild(optBuy);
+  // clear out any old options
+  sel.innerHTML = "";
 
-      const optSell = document.createElement("option");
-      optSell.value = res;
-      optSell.textContent = res;
-      sellSelect.appendChild(optSell);
-    });
-  }
+  // only insert resources that actually exist in RESOURCE_DATA
+  RESOURCE_TYPES.forEach((res) => {
+    if (!RESOURCE_DATA[res]) {
+      console.warn(`populateSelectors(): skipping unknown resource → "${res}"`);
+      return;
+    }
+    const opt = document.createElement("option");
+    opt.value = res;
+    opt.textContent = res;
+    sel.appendChild(opt);
+  });
 }
+
+
 
 function updateLeaderboard() {
   const tbody = document.getElementById("leaderboardBody");
@@ -807,7 +801,7 @@ function updateSpreadTable() {
 }
 
 function updateSellButton() {
-  const res = document.getElementById("sellResourceSelect").value;
+  const res = document.getElementById("tradeResourceSelect").value;
   const sellBtn = document.querySelector("button.btn-danger"); // assuming this is the Sell button
 
   if (!sellBtn || !res) return;
@@ -816,7 +810,7 @@ function updateSellButton() {
     player.inventory[res]?.reduce((sum, [qty]) => sum + qty, 0) || 0;
 
   sellBtn.disabled = inventoryAmount === 0;
-  sellBtn.innerText = inventoryAmount === 0 ? "No Inventory" : "Sell";
+  sellBtn.innerText = inventoryAmount === 0 ? "-" : "Sell";
 }
 
 function toggleMarketView() {

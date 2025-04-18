@@ -4,7 +4,7 @@ let tradeTimestamps = [];
 let warpAborted = false;
 
 let gamePaused = false;
-let gameStartTime = null;
+
 let lastPrices = {};
 let pendingTrade = null;
 let marketViewMode = "all";
@@ -37,12 +37,11 @@ function calculateInitialTrends() {
       let trend = "same";
       const previousPrice = savedPriceData[key];
       if (previousPrice !== undefined) {
-        trend =
-          currentPrice > previousPrice
-            ? "up"
-            : currentPrice < previousPrice
-            ? "down"
-            : "same";
+        if (currentPrice > previousPrice) {
+          trend = "up";
+        } else if (currentPrice < previousPrice) {
+          trend = "down";
+        }
       }
 
       lastPrices[key] = {
@@ -96,20 +95,27 @@ function initGame() {
   loadGameState();
   toggleTravelButton();
 
-  // Set default amounts
-  document.getElementById("buyAmount").value = 10;
-  document.getElementById("sellAmount").value = 10;
+  document.getElementById("tradeAmount").value = 10;
+  document.getElementById("tradeResourceSelect").value = RESOURCE_TYPES[0];
+
+  document
+  .getElementById("tradeResourceSelect")
+  .addEventListener("change", updateUI);
+  document
+  .getElementById("tradeAmount")
+  .addEventListener("input", updateUI);
+
+
 
   // Set default selected resource
   const firstRes = RESOURCE_TYPES[0];
-  document.getElementById("buyResourceSelect").value = firstRes;
-  document.getElementById("sellResourceSelect").value = firstRes;
+  document.getElementById("tradeResourceSelect").value = firstRes;
 
   document
     .getElementById("toggleMarketView")
     .addEventListener("click", toggleMarketView);
 
-  ["buyAmount", "sellAmount"].forEach((id) => {
+  ["tradeAmount"].forEach((id) => {
     const input = document.getElementById(id);
     input.addEventListener("input", () => {
       if (input.value.length > 6) {
@@ -214,6 +220,7 @@ function initGame() {
   // Initialize UI
   calculateInitialTrends();
   populateSelectors();
+  populateWarpDropdown();
   processAndRenderShipments();
   updateUI();
 }
@@ -250,6 +257,14 @@ function updateUI() {
   randomizeGlitchDelays();
 
   updateSpreadTable();
+  const sel = document.getElementById("tradeResourceSelect");
+  const inp = document.getElementById("tradeAmount");
+  const res = sel ? sel.value : null;
+  const amt = inp ? parseInt(inp.value, 10) : 0;
+
+  updateBuyBreakdown(res, amt);
+  updateSellBreakdown(res, amt);
+
 }
 
 let warpTargetPath = [];

@@ -29,7 +29,7 @@
     <div class="loading-content">
       <output class="spinner-border text-info mb-3" name="warpStatus"></output>
       <div class="nav-logo resource-name"><strong>ΛTLΛS | ΞQUINOX™</strong><br><small>An Interstellar Trading Company</small> </div>
-      <button class="btn btn-danager" onclick="resetGameState()">Emergency Save Reset</button>
+      <button type="button" class="btn btn-danager" onclick="resetGameState()">Emergency Save Reset</button>
 
     </div>
   </div>
@@ -217,24 +217,20 @@
 
 
       <section class="console-wrapper2 mb-3">
-        <small><label class="form-label"><text class="highlight">Buy Resource: </text></label></small>
-        <select id="buyResourceSelect" class="form-select mb-2"></select>
-        <input type="number" id="buyAmount" maxlength="3" min="1" class="form-control mb-2" value="5"
-          placeholder="Amount" />
-        <button class="btn btn-success w-100" onclick="buyMaterial()">Buy</button>
+        <small><label class="form-label"><text class="highlight">Trade Summary:</text></label></small><br>
+        <small><text class="highlight">B: </text><span id="buybreakdown">~</span></small><br>
+        <small><text class="highlight">S: </text><span id="sellbreakdown">~</span></small><br>
 
-        <small><label class="form-label"><text class="highlight">Sell Resource: </text></label></small>
-        <select id="sellResourceSelect" class="form-select mb-2"></select>
-        <input type="number" id="sellAmount" maxlength="3" min="1" class="form-control mb-2" value="5"
-          placeholder="Amount" />
-        <button class="btn btn-danger w-100" onclick="sellMaterial()">Sell</button>
+        <small><label class="form-label"><text class="highlight">Trade Resource: </text></label></small>
+        <select id="tradeResourceSelect" class="form-select mb-2"></select>
+      
+        <input type="number" id="tradeAmount" maxlength="3" min="1" class="form-control mb-2" value="5" placeholder="Amount" />
+      
+        <div class="d-flex gap-2">
+          <button class="btn btn-success w-50" onclick="buyMaterial()">Buy</button>
+          <button class="btn btn-danger w-50" onclick="sellMaterial()">Sell</button>
+        </div>
       </section>
-
-      <!--
-
-      for NPC Debug etc
-      <text id="tradeStats" class="trade-stats greyed-out">Trade Counter: <span id="tradeCount">0</span></text>
-       -->
 
       <text style="color: #ffc107;">Game Last Saved: </text><br><div id="saveStatus" class="greyed-out">Loading...</div>
       
@@ -455,9 +451,10 @@
   <script src="./js/npc.js" defer></script>
   <script src="./js/state.js" defer></script>
   <script src="./js/travel.js" defer></script>
-  <script src="./js/ui.js" defer></script>
+
   <script src="./js/utils.js" defer></script>
   <script src="./js/trade_contracts.js" defer></script>
+  <script src="./js/ui.js" defer></script>
   <script src="./js/core.js" defer></script>
 
   <link rel="shortcut icon" href="images/Fav.png">

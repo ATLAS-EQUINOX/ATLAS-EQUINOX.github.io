@@ -108,7 +108,6 @@ function logNpcSellTransaction(
   exportTaxRate
 ) {
   const exportTax = sold * price * exportTaxRate;
-  const afterTax = sold * price - exportTax;
   const profitColor = profitOrLoss >= 0 ? "text-success" : "text-danger";
   const profitLabel = profitOrLoss >= 0 ? "Profit" : "Loss";
 
