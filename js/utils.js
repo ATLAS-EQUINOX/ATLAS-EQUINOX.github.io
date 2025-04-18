@@ -125,9 +125,39 @@ function countBatches(store) {
   return count;
 }
 
+/**
+ * Returns a delay (ms) between 3 s and 10 min, 
+ * with most deliveries clustered near ~30 s–2 min but
+ * a long tail and occasional hold‑ups.
+ */
 function getRandomShipmentDelay() {
-  const min = 3000; // 3 seconds
-  const max = 300000; // 10 minutes
-  const skewed = Math.pow(Math.random(), 2); // Squared = bias toward 0
-  return Math.floor(skewed * (max - min) + min);
+  const minMs = 5_000;    // 3 s
+  const maxMs = 300_000;  // 5 min for the bulk
+
+  // 1) generate a log‑normal random around μ=10s, σ=1.0
+  function randStdNormal() {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+  const μ = Math.log(30_000);   // median ≈30 s
+  const σ = 1.0;                // controls spread
+  let delay = Math.exp(μ + σ * randStdNormal());
+
+  // 2) rare event hold‑ups
+  const e = Math.random();
+  if (e < 0.05) {
+    // 1% chance of pirate ambush: +30–60 s
+    delay += 30_000 + Math.random()*30_000;
+  } else if (e < 0.03) {
+    // additional 2% chance of storm: +60–120 s
+    delay += 60_000 + Math.random()*60_000;
+  }
+
+  // 3) clamp to [minMs, maxMs + any hold‑up]
+  delay = Math.max(minMs, Math.min(maxMs, delay));
+
+  return Math.floor(delay);
 }
+

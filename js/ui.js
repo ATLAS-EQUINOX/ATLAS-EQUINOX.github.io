@@ -639,8 +639,8 @@ function updateMarketTable() {
   function formatEstimate(val, hops) {
     if (hops === null || hops > 12) return "∅";
 
-    if (hops <= 5) return val.toFixed(2);
-    if (hops === 6) return val.toFixed(1);
+    if (hops <= 7) return val.toFixed(2);
+    if (hops === 9) return val.toFixed(1);
     if (hops <= 10) return Math.round(val).toString();
     // Hide zero estimates
     return `${Math.round(val / 25) * 25}`;

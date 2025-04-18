@@ -263,7 +263,7 @@ function updateUI() {
   const amt = inp ? parseInt(inp.value, 10) : 0;
 
   updateBuyBreakdown(res, amt);
-  updateSellBreakdown(res, amt);
+
 
 }
 

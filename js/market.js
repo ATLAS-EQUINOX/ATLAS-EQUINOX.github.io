@@ -1,46 +1,91 @@
-function getTimeSeededPrice(system, resource) {
-  const time = new Date();
-  const minute = Math.floor(time.getUTCSeconds() / 10);
-  const hour = time.getUTCHours();
-  const day = time.getUTCDate();
-  const month = time.getUTCMonth();
-  // Fixed time seed (per minute, UTC-based)
-  const seed = [system, resource, day, month, hour, minute].join("-");
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash ^= seed.charCodeAt(i);
-    hash +=
-      (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
-    hash >>>= 0;
-  }
-  const { base, volatility } = RESOURCE_DATA[resource];
-  const variation = (Math.sin(hash) + 1) / 2; // 0–1
-  let offset = (variation - 0.5) * volatility * base * 10;
-  // Replace Math.random() with deterministic event simulation
-  const spikeChance = (hash % 1000) / 1000;
-  if (spikeChance > 0.98) {
-    // spike
-    const spikeMultiplier = 1 + ((hash >> 5) % 200) / 100; // 1.00x to 3.00x
-    offset += base * spikeMultiplier;
-  } else if (spikeChance < 0.02) {
-    // crash
-    const dropMultiplier = 1 + ((hash >> 3) % 150) / 100; // 1.00x to 2.50x
-    offset -= base * dropMultiplier;
-  }
-  // 📊 Count global availability
-  let availableCount = 0;
-  let totalSystems = SYSTEM_NAMES.length;
-  for (let sys of SYSTEM_NAMES) {
-    const marketEntry = systems[sys]?.market?.[resource];
-    if (marketEntry) availableCount++;
-  }
-  // 📉 If it's rare, apply scarcity boost (0–30%)
-  let scarcityMultiplier =
-    1 + ((totalSystems - availableCount) / totalSystems) * 0.3;
-  const rawPrice = (base + offset) * scarcityMultiplier;
-  const clamped = Math.max(base * 0.5, Math.min(base * 3, rawPrice));
-  return parseFloat(clamped.toFixed(2));
+// --- helper: seeded PRNG from an integer seed ---
+function mulberry32(a) {
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
 }
+// seeded gaussian via Box–Muller
+function seededGaussian(rng) {
+  let u = 0, v = 0;
+  while(u === 0) u = rng();
+  while(v === 0) v = rng();
+  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+}
+
+function getTimeSeededPrice(systemName, resource) {
+  const now  = new Date();
+  const minute = now.getUTCMinutes();
+  const hour   = now.getUTCHours();
+  const day    = now.getUTCDay();     // 0–6
+  const date   = now.getUTCDate();    // 1–31
+  const month  = now.getUTCMonth();   // 0–11
+
+  // 1) build a numeric seed from system/resource + current minute‑tick
+  const seedStr = `${systemName}|${resource}|${date}|${month}|${hour}|${Math.floor(now.getUTCSeconds()/10)}`;
+  let seed = 0;
+  for (let i = 0; i < seedStr.length; i++) {
+    seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
+  }
+  const rng = mulberry32(seed);
+
+  // 2) base & vol
+  const { base, volatility } = RESOURCE_DATA[resource];
+
+  // 3) seasonality: daily and weekly cycles
+  const dailyCycle  = Math.sin((hour + minute/60) / 24 * 2*Math.PI);
+  const weeklyCycle = Math.sin((day + date/31)   / 7  * 2*Math.PI);
+
+  // 4) noise term: gaussian noise scaled by volatility
+  const noise = seededGaussian(rng) * volatility * base * 0.5;
+
+  // 5) momentum: compare to last stored price
+  const historyKey = `priceHist|${systemName}|${resource}`;
+  const hist = JSON.parse(localStorage.getItem(historyKey) || "[]");
+  const lastPrice = hist.length ? hist[hist.length-1] : base;
+  const prevPrice = hist.length > 1 ? hist[hist.length-2] : lastPrice;
+  const momentum = (lastPrice - prevPrice) * 0.3;
+
+  // 6) assemble raw
+  let raw = base
+    // nudges
+    + dailyCycle  * (volatility*0.1*base)
+    + weeklyCycle * (volatility*0.2*base)
+    // noise + momentum
+    + noise + momentum;
+
+  // 7) rare event: a log‑normal spike or crash
+  const eventRoll = rng();
+  if (eventRoll > 0.997) {
+    // spike
+    raw *= 1 + Math.exp(rng()*2);       // up to ~7x
+  } else if (eventRoll < 0.003) {
+    // crash
+    raw *= Math.exp(-rng()*2);          // down to ~0.14x
+  }
+
+  // 8) scarcity boost (unchanged)
+  const totalSys = SYSTEM_NAMES.length;
+  const avail    = SYSTEM_NAMES.filter(
+    s => systems[s].market?.[resource]
+  ).length;
+  const scarcity = 1 + ((totalSys - avail)/totalSys)*0.3;
+  raw *= scarcity;
+
+  // 9) clamp & store history
+  const clamped = Math.max(base*0.5, Math.min(base*3, raw));
+  const final   = parseFloat(clamped.toFixed(2));
+
+  // push to history ring‑buffer
+  hist.push(final);
+  if (hist.length > 5) hist.shift(); // keep last 5 prices
+  localStorage.setItem(historyKey, JSON.stringify(hist));
+
+  return final;
+}
+
 
 function getBuySellPrice(basePrice) {
   const spread = basePrice * 0.03; // 3% spread
@@ -304,99 +349,126 @@ function sellAllOfResource(resource) {
   updateUI();
 }
 
+/**
+ * Simulate what the new unit price would be
+ * if you bought `amount` more at once.
+ */
+function projectPostBuyPrice(systemName, resource, amount) {
+  const system = systems[systemName];
+
+  // 1️⃣ Guard missing market or zero supply
+  const market = system.market?.[resource];
+  if (!market || market.supply === 0) {
+    const fallback =
+      system.prices[resource] ?? getTimeSeededPrice(systemName, resource);
+    return parseFloat(fallback.toFixed(2));
+  }
+
+  // 2️⃣ Your existing projection logic
+  const timePrice = getTimeSeededPrice(systemName, resource);
+  const totalSys  = SYSTEM_NAMES.length;
+  const avail     = SYSTEM_NAMES.filter(
+    sys => systems[sys].market?.[resource]
+  ).length;
+  const scarcity  = 1 + ((totalSys - avail) / totalSys) * 0.3;
+  const rawBase   = timePrice * scarcity;
+
+  const newDemand = market.demand + amount;
+  const ratio     = newDemand / market.supply;
+  let impacted    = rawBase * (
+    ratio > 1
+      ? 1 + (ratio - 1) * 0.01
+      : 1 - (1 - ratio) * 0.01
+  );
+
+  const base = RESOURCE_DATA[resource].base;
+  impacted = Math.max(base * 0.5, Math.min(base * 3, impacted));
+
+  return parseFloat(impacted.toFixed(2));
+}
+
+
+
 function updateBuyBreakdown(res, amt) {
-  const price = systems[player.location]?.prices?.[res];
-  if (typeof price !== "number" || !amt) {
+  if (!amt || !RESOURCE_DATA[res]) {
     return document.getElementById("buybreakdown").textContent = "~";
   }
+  // ← use projected price, not current
+  const unitPrice = projectPostBuyPrice(player.location, res, amt);
+  const taxRate   = systems[player.location].tariffs.importTaxRate || 0;
+  const tax       = unitPrice * amt * taxRate;
+  const total     = unitPrice * amt + tax;
+
   document.getElementById("buybreakdown").textContent =
-    (price * amt).toFixed(2) + "ᶜ";
+    `${total.toFixed(2)}ᶜ`;
 }
 
-
-function updateSellBreakdown(res, amt) {
-  const price = systems[player.location]?.prices?.[res];
-  if (typeof price !== "number" || !amt) {
-    return document.getElementById("sellbreakdown").textContent = "~";
-  }
-  document.getElementById("sellbreakdown").textContent =
-    (price * amt).toFixed(2) + "ᶜ";
-}
 
 
 function buyMaterial() {
-  const res = document.getElementById("tradeResourceSelect").value;
+  const res      = document.getElementById("tradeResourceSelect").value;
   const amtInput = document.getElementById("tradeAmount");
-  const amt = parseInt(amtInput.value, 10);
+  const amt      = parseInt(amtInput.value, 10);
   if (!amt || amt <= 0) return log("Invalid quantity.");
 
   updateBuyBreakdown(res, amt);
-
 
   if (!RESOURCE_DATA[res]) {
     return log(`Unknown resource: ${res}`);
   }
 
-  const system = systems[player.location];
-  const market = system.market[res];
+  const system        = systems[player.location];
+  const market        = system.market[res];
   if (!market) {
     return log(`${res} is not currently available in ${player.location}.`);
   }
 
-  const basePrice = system.prices[res];
-  const { buyPrice } = getBuySellPrice(basePrice);
+  const projectedUnit = projectPostBuyPrice(player.location, res, amt);
+  const { buyPrice }  = getBuySellPrice(projectedUnit);
   const importTaxRate = system.tariffs?.importTaxRate || 0;
 
   // Show breakdown before confirmation
   updateBuyBreakdown(res, amt, buyPrice, importTaxRate);
 
-  // Now set the pendingTrade
-  pendingTrade = () => {
-    const unitCost = buyPrice * (1 + importTaxRate);
-    const totalCost = unitCost * amt;
-
-    if (player.credits < totalCost) {
-      const maxAffordable = Math.floor(player.credits / unitCost);
-      if (maxAffordable > 0) {
-        amtInput.value = maxAffordable;
-        return log(
-          `Not enough credits. You can afford up to ${maxAffordable}× ${res}.`
-        );
-      }
-      return log("Not enough credits to buy any units.");
+  // **EARLY CREDIT CHECK** 👇
+  const unitCost  = buyPrice * (1 + importTaxRate);
+  const totalCost = unitCost * amt;
+  if (player.credits < totalCost) {
+    const maxAffordable = Math.floor(player.credits / unitCost);
+    if (maxAffordable > 0) {
+      amtInput.value = maxAffordable;
+      return log(
+        `Not enough credits. You can afford up to ${maxAffordable}× ${res}.`
+      );
     }
+    return log("Not enough credits to buy any units.");
+  }
+  // — now we know they can pay, so on to the real trade
 
+  pendingTrade = () => {
     // Deduct credits & queue shipment
     player.credits -= totalCost;
     player.shipments.push({
-      id: `SHIP-${Date.now().toString().slice(-5)}`,
+      id:       `SHIP-${Date.now().toString().slice(-5)}`,
       resource: res,
-      amount: amt,
-      price: buyPrice,
-      time: Date.now() + getRandomShipmentDelay(),
+      amount:   amt,
+      price:    buyPrice,
+      time:     Date.now() + getRandomShipmentDelay(),
     });
 
     recentPlayerBuys[`${player.location}-${res}`] = Date.now();
     market.demand += amt;
-
-    // Recalculate price
-    const ratio = market.demand / market.supply;
-    const base = RESOURCE_DATA[res].base;
-    let newPrice =
-      buyPrice * (ratio > 1
-        ? 1 + (ratio - 1) * 0.01
-        : 1 - (1 - ratio) * 0.01);
-    system.prices[res] = parseFloat(
-      Math.max(base * 0.5, Math.min(base * 3, newPrice)).toFixed(2)
-    );
+    const newP = projectPostBuyPrice(player.location, res, amt);
+    systems[player.location].prices[res] = newP;
 
     flash("credits");
     updateUI();
   };
 
-  // Show the confirmation dialog / summary
+  // Show the confirmation dialog / summary (and then run & log it)
   showTradeSummary("buy", res, amt, buyPrice);
 }
+
 
 
 function sellMaterial() {
@@ -405,7 +477,7 @@ function sellMaterial() {
   if (!amt || amt <= 0) return log("Invalid quantity.");
 
 
-  updateSellBreakdown(res, amt);
+
 
   if (!RESOURCE_DATA[res]) {
     return log(`Unknown resource: ${res}`);
@@ -438,7 +510,7 @@ function sellMaterial() {
   const inventoryAmount = inv.reduce((sum, [qty]) => sum + qty, 0);
   if (inventoryAmount === 0) return log("No inventory to sell.");
 
-  const sellAmt = Math.min(rawAmt, inventoryAmount);
+  const sellAmt = Math.min(amt, inventoryAmount);
 
   const lastBuyTime = recentPlayerBuys[`${player.location}-${res}`];
   if (lastBuyTime && Date.now() - lastBuyTime < TRADE_COOLDOWN) {
@@ -447,7 +519,7 @@ function sellMaterial() {
   }
 
   // Show breakdown before confirmation
-  updateSellBreakdown(res, sellAmt, price);
+
 
   pendingTrade = () => {
     let toSell = sellAmt, sold = 0, totalPaid = 0;
@@ -507,7 +579,7 @@ function showTradeSummary(type, res, amt, price) {
     document.getElementById("sellbreakdown").textContent = "~";
   } else {
     // S: span shows unit price and revenue after tax
-    updateSellBreakdown(res, amt, price);
+
     // Clear buy span
     document.getElementById("buybreakdown").textContent = "~";
   }
@@ -525,7 +597,7 @@ function showTradeSummary(type, res, amt, price) {
           2
         )}ᶜ each +${taxAmount.toFixed(2)}ᶜ tax → ${finalTotal.toFixed(
           2
-        )}ᶜ total; credits left: ${player.credits.toFixed(2)}ᶜ.`
+        )}ᶜ total.`
       );
     } else {
       // calculate cost basis for profit/loss
