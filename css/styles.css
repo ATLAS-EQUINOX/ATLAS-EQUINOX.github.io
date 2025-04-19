@@ -1698,3 +1698,31 @@ pre {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+#atlas-scroll-wrapper {
+  width: 1920px;
+  height: 1080px;
+  overflow: auto;
+  margin: 0 auto;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+}
+
+.container, .row, .col, .col-* {
+  flex: none !important;
+  width: auto !important;
+  max-width: unset !important;
+}
+
+.sidebar, .inventory-panel {
+  flex: 0 0 300px;
+}
+.main-and-console {
+  flex: 1;
+}

@@ -6,7 +6,7 @@ let gameStartTime;
 let playerHighScore = 100;
 let player = {
   location: SYSTEM_NAMES[Math.floor(Math.random() * SYSTEM_NAMES.length)],
-  credits: 100,
+  credits: 200,
   fuel: 853,
   inventory: {},
   vault: {},

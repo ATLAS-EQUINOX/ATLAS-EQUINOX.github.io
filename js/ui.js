@@ -495,7 +495,7 @@ function processAndRenderShipments() {
         : `${s.id} | ${s.amount}${UNIT} ${s.resource}`;
       
         if (s.delayedByWarp) {
-          label += ` <span class="text-warning">(Delayed)</span>`;
+          label += ` <span class="text-danger">(Delayed Due to Warping)</span>`;
         }
 
         return `<li style="border-left: 4px solid ${color}; padding-left: 6px;">
