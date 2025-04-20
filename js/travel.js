@@ -80,6 +80,7 @@ function beginWarpStep(hopIndex) {
     document.getElementById("warp-overlay").classList.remove("d-none");
     disableTradeControls(true);
   }
+  
 
   // UI progress
   const progressBar = document.getElementById("warp-progress-bar");

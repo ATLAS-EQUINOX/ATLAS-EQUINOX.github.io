@@ -128,7 +128,7 @@ function toggleTravelButton() {
       const hops = path.length - 1;
       const cost = hops * 10; // adjust if needed
       btn.disabled = player.fuel < cost;
-      btn.innerText = `Warp (${hops} Jump${hops !== 1 ? "s" : ""})`;
+      btn.innerText = `${hops} Jump${hops !== 1 ? "s" : ""}`;
     }
   }
 }
@@ -264,7 +264,7 @@ function updateInventoryDisplay() {
     resTitle.textContent = res;
     const sellAllBtn = document.createElement("button");
     sellAllBtn.className = "sell-batch-btn";
-    sellAllBtn.textContent = "Sell Resource";
+    sellAllBtn.textContent = "Sell All";
     sellAllBtn.onclick = () => {
       sellAllOfResource(res);
     };
@@ -295,7 +295,7 @@ function updateInventoryDisplay() {
 
       const sellBtn = document.createElement("button");
       sellBtn.className = "sell-batch-btn";
-      sellBtn.textContent = "Sell";
+      sellBtn.textContent = "Sell Batch";
       sellBtn.onclick = () => {
         sellBtn.disabled = true;
         sellBtn.textContent = "Processing...";

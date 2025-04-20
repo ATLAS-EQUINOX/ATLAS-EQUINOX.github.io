@@ -136,17 +136,17 @@ function resetGameState() {
 
 function refuel() {
   const fuelPrice = systems[player.location].prices["Fuel"];
-  const fuelNeeded = FUEL_CAPACITY - player.fuel;
-  if (fuelNeeded === 0) return log("Your fuel tank is already full.");
-  const affordableUnits = Math.floor(player.credits / fuelPrice);
-  if (affordableUnits === 0)
-    return log("You don't have enough credits to buy any fuel.");
-  const unitsToBuy = Math.min(fuelNeeded, affordableUnits);
-  const totalCost = unitsToBuy * fuelPrice;
-  player.fuel += unitsToBuy;
-  player.credits -= totalCost;
+  if (player.fuel >= FUEL_CAPACITY)
+    return log("Your fuel tank is already full.");
+  if (player.credits < fuelPrice)
+    return log("You don't have enough credits to buy fuel.");
+
+  player.fuel += 1;
+  player.credits -= fuelPrice;
+
   flash("fuel");
   flash("credits");
-  log(`Refueled ${unitsToBuy} units at ${fuelPrice.toFixed(2)}ᶜ each.`);
+  log(`Refueled 1 unit at ${fuelPrice.toFixed(2)}ᶜ.`);
   updateUI();
 }
+

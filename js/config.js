@@ -1,98 +1,116 @@
 const RESOURCE_TYPES = [
-    "Iron",
-    "Helium",
-    "Gold",
-    "Water",
-    "Uranium",
-    "Copper",
-    "Silicon",
-    "Titanium",
-    "Hydrogen",
     "Carbon",
-    "Platinum",
+    "Cobalt",
+    "Copper",
+    "Fuel",
+    "FuelXR",
+    "Gold",
+    "Helium",
+    "Hydrogen",
+    "Iron",
+    "Iridium",
+    "Lithium",
+    "Neon",
     "Nickel",
     "Oxygen",
-    "Neon",
-    "Cobalt",
-    "Lithium",
-    "Iridium",
-    "Fuel",
+    "Platinum",
+    "Scrap",
+    "Silicon",
+    "Soil",
+    "Titanium",
+    "Uranium",
+    "Water",
 ];
 
 const RESOURCE_DATA = {
-Iron: {
-    base: 45, // Abundant structural metal
+    Carbon: {
+    base: 28, // Versatile industrial element, organic compounds
+    volatility: 0.03,
+    },
+    Cobalt: {
+    base: 120, // Essential for aerospace alloys and batteries
+    volatility: 0.035,
+    },
+    Copper: {
+    base: 80, // Electronics and wiring, steady demand
+    volatility: 0.02,
+    },
+    Fuel: {
+    base: 5, // Basic propulsion fuel, highly regulated
+    volatility: 0.02,
+    },
+    FuelXR: {
+    base: 101, // Advanced fuel, critical for long-range ops
+    volatility: 0.02,
+    },
+    Gold: {
+    base: 950, // Stable, high-value precious metal
     volatility: 0.01,
-},
-Helium: {
-    base: 22, // Inert gas, lightweight transport cost
+    },
+    Helium: {
+    base: 22, // Inert transport gas, low mass cost
     volatility: 0.04,
-},
-Gold: {
-    base: 950, // High value, low market flux
+    },
+    Hydrogen: {
+    base: 35, // Light fuel gas, high volume use
+    volatility: 0.05,
+    },
+    Iron: {
+    base: 45, // Abundant metal for construction
     volatility: 0.01,
-},
-Water: {
-    base: 20, // Scarce and essential off-Earth
-    volatility: 0.03,
-},
-Uranium: {
-    base: 1200, // Rare, regulated, high-value
+    },
+    Iridium: {
+    base: 1100, // Rare catalytic metal, very stable
+    volatility: 0.015,
+    },
+    Lithium: {
+    base: 140, // Key battery material, demand volatility
+    volatility: 0.05,
+    },
+    Neon: {
+    base: 18, // Rare noble gas, limited industrial use
+    volatility: 0.05,
+    },
+    Nickel: {
+    base: 55, // Used in alloys and plating
     volatility: 0.02,
-},
-Copper: {
-    base: 80, // Used in electronics, moderate value
+    },
+    Oxygen: {
+    base: 75, // Critical for life support systems
+    volatility: 0.035,
+    },
+    Platinum: {
+    base: 850, // Precious metal, catalytic applications
+    volatility: 0.015,
+    },
+    Scrap: {
+    base: 2, // Recycled materials, fluctuating utility
     volatility: 0.02,
-},
-Silicon: {
-    base: 65, // Semiconductor basis, moderate use
+    },
+    Silicon: {
+    base: 65, // Semiconductors and solar tech
     volatility: 0.025,
-},
-Titanium: {
-    base: 300, // Strong alloy metal
+    },
+    Soil: {
+    base: 2, // Agriculture and terraforming base
     volatility: 0.02,
-},
-Hydrogen: {
-    base: 35, // Fuel-grade gas
-    volatility: 0.05,
-},
-Carbon: {
-    base: 28, // Versatile industrial use
+    },
+    Titanium: {
+    base: 300, // High-strength alloy, aerospace-grade
+    volatility: 0.02,
+    },
+    Uranium: {
+    base: 1200, // Nuclear fuel, restricted trade
+    volatility: 0.02,
+    },
+    Water: {
+    base: 20, // Essential for survival, scarce off-world
     volatility: 0.03,
-},
-Platinum: {
-    base: 850, // Precious catalyst metal
-    volatility: 0.015,
-},
-Nickel: {
-    base: 55, // Industrial metal
-    volatility: 0.02,
-},
-Oxygen: {
-    base: 75, // Life support, very valuable in space
-    volatility: 0.035,
-},
-Neon: {
-    base: 18, // Rare noble gas
-    volatility: 0.05,
-},
-Cobalt: {
-    base: 120, // High-tech material
-    volatility: 0.035,
-},
-Lithium: {
-    base: 140, // Battery essential, volatile demand
-    volatility: 0.05,
-},
-Iridium: {
-    base: 1100, // Very rare, top-tier catalyst
-    volatility: 0.015,
-},
-Fuel: {
-    base: 5, // Critical to operations, regulated
-    volatility: 0.02,
-},
+    },
 };
+
+
+
 
 const SYSTEM_NAMES = [
     "55 Cancri",
@@ -100,6 +118,7 @@ const SYSTEM_NAMES = [
     "Altair",
     "Barnard's Star",
     "Beta Pictoris",
+    "Deneb",
     "Epsilon Eridani",
     "Fomalhaut",
     "Gliese 581",
@@ -108,51 +127,75 @@ const SYSTEM_NAMES = [
     "Kapteyn's Star",
     "Kepler-22b",
     "Kepler-442b",
-    ];
+    "Luyten's Star",
+    "Tau Ceti",
+    "TRAPPIST-1",
+    "Wolf 359",
+];
 
 const SPECIALIZATION_EFFECTS = {
-    "Metals": ["Iron", "Copper", "Nickel", "Cobalt", "Titanium"],
+    "Base Metals": ["Iron", "Nickel", "Copper", "Cobalt", "Scrap"],
+    "High-Tech Materials": ["Lithium", "Silicon", "Cobalt", "Platinum"],
+    "Fuel & Energy": ["Fuel", "FuelXR", "Hydrogen", "Helium", "Uranium"],
+    "Noble Gases": ["Helium", "Neon"],
+    "Water & Oxygen": ["Water", "Oxygen"],
+    "Organic Materials": ["Carbon", "Soil", "Silicon", "Oxygen"],
     "Precious Metals": ["Gold", "Platinum", "Iridium"],
-    "Fuel": ["Fuel", "Hydrogen", "Helium", "Uranium"],
-    "Gases": ["Helium", "Neon", "Hydrogen", "Oxygen"],
-    "Ice": ["Water", "Oxygen"],
-    "Organics": ["Carbon", "Silicon", "Oxygen"],
-    "Rare Earths": ["Lithium", "Uranium", "Iridium"],
+    "Structural Alloys": ["Titanium", "Iron", "Nickel"],
+    "Exotic Resources": ["Iridium", "Uranium", "Neon"],
 };
 
 const SYSTEM_SPECIALIZATIONS = {
-    "55 Cancri": ["Rare Earths"],
-    "Alpha Centauri": ["Metals"],
-    "Altair": ["Ice"],
-    "Barnard's Star": ["Gases"],
-    "Beta Pictoris": ["Fuel"],
-    "Epsilon Eridani": ["Fuel"],
-    "Fomalhaut": ["Organics"],
-    "Gliese 581": ["Rare Earths"],
-    "Gliese 667 C": ["Gases"],
-    "HD 40307": ["Metals"],
-    "Kapteyn's Star": ["Ice"],
-    "Kepler-22b": ["Gases"],
-    "Kepler-442b": ["Ice"],
+    "55 Cancri": ["Rare Earths", "Exotic Resources"],
+    "Alpha Centauri": ["Base Metals", "Structural Alloys"],
+    "Altair": ["Ice", "Water & Oxygen"],
+    "Barnard's Star": ["Gases", "Noble Gases"],
+    "Beta Pictoris": ["Fuel & Energy"],
+    "Deneb": ["Precious Metals", "Exotic Resources"],
+    "Epsilon Eridani": ["Fuel & Energy", "Base Metals"],
+    "Fomalhaut": ["Organic Materials", "Water & Oxygen"],
+    "Gliese 581": ["Rare Earths", "High-Tech Materials"],
+    "Gliese 667 C": ["Gases", "Noble Gases"],
+    "HD 40307": ["Base Metals", "Structural Alloys"],
+    "Kapteyn's Star": ["Ice", "Water & Oxygen"],
+    "Kepler-22b": ["Gases", "Fuel & Energy"],
+    "Kepler-442b": ["Ice", "Organic Materials"],
+    "Luyten's Star": ["High-Tech Materials", "Rare Earths"],
+    "Tau Ceti": ["Precious Metals", "Organic Materials"],
+    "TRAPPIST-1": ["Water & Oxygen", "Structural Alloys"],
+    "Wolf 359": ["Base Metals", "Fuel & Energy"],
 };
-
+  
 
 
 const WARP_GRAPH = {
-    "55 Cancri": ["Kepler-452b", "Beta Pictoris", "Vega"],
-    "Alpha Centauri": ["Sol", "Proxima Centauri", "Ross 128"],
+    "55 Cancri": ["Beta Pictoris", "Kepler-452b", "Vega"],
+    "Alpha Centauri": ["Proxima Centauri", "Ross 128", "Sol"],
     "Altair": ["Fomalhaut", "Vega", "YZ Ceti"],
-    "Barnard's Star": ["Wolf 359", "Kapteyn's Star", "Tau Ceti"],
-    "Beta Pictoris": ["55 Cancri", "Kepler-442b", "Gliese 667 C"],
-    "Epsilon Eridani": ["TRAPPIST-1e", "Luyten's Star", "Gliese 581"],
+    "Barnard's Star": ["Kapteyn's Star", "Tau Ceti", "Wolf 359"],
+    "Beta Pictoris": ["55 Cancri", "Gliese 667 C", "Kepler-442b"],
+    "Epsilon Eridani": ["Gliese 581", "Luyten's Star", "TRAPPIST-1e"],
     "Fomalhaut": ["Altair", "Sirius", "TRAPPIST-1e"],
     "Gliese 581": ["Epsilon Eridani", "Kapteyn's Star"],
     "Gliese 667 C": ["Beta Pictoris", "Kepler-22b"],
-    "HD 40307": ["Lalande 21185", "Tau Ceti", "Kepler-22b"],
+    "HD 40307": ["Kepler-22b", "Lalande 21185", "Tau Ceti"],
     "Kapteyn's Star": ["Barnard's Star", "Gliese 581", "Lalande 21185"],
-    "Kepler-22b": ["HD 40307", "Gliese 667 C", "Kepler-442b"],
-    "Kepler-442b": ["Kepler-22b", "Beta Pictoris", "Wolf 359"],
+    "Kepler-22b": ["Gliese 667 C", "HD 40307", "Kepler-442b"],
+    "Kepler-442b": ["Beta Pictoris", "Kepler-22b", "Wolf 359"],
+    "Kepler-452b": ["55 Cancri"],
+    "Lalande 21185": ["HD 40307", "Kapteyn's Star"],
+    "Luyten's Star": ["Epsilon Eridani"],
+    "Proxima Centauri": ["Alpha Centauri"],
+    "Ross 128": ["Alpha Centauri"],
+    "Sirius": ["Fomalhaut"],
+    "Sol": ["Alpha Centauri"],
+    "Tau Ceti": ["Barnard's Star", "HD 40307"],
+    "TRAPPIST-1e": ["Epsilon Eridani", "Fomalhaut"],
+    "Vega": ["55 Cancri", "Altair"],
+    "Wolf 359": ["Barnard's Star", "Kepler-442b"],
+    "YZ Ceti": ["Altair"],
 };
+  
 
 
 const npcCorporations = [
