@@ -96,15 +96,52 @@ function getBuySellPrice(basePrice) {
   };
 }
 
-function getImportTax(system, unitPrice, amount) {
-  const rate = systems[system]?.tariffs?.importTaxRate || 0;
-  return unitPrice * amount * rate;
+
+function getImportTax(system, resource, unitPrice) {
+  const baseRate = TARIFF_SETTINGS.baseImport;
+  const market = systems[system]?.market?.[resource];
+  let rate = baseRate;
+
+  // Dynamic adjustment
+  if (market) {
+    const imbalance = (market.demand - market.supply) / (market.supply + 1);
+    rate += imbalance * TARIFF_SETTINGS.dynamicAdjustmentFactor;
+  }
+
+  // High-value goods penalty
+  if (unitPrice > TARIFF_SETTINGS.highValueThreshold) {
+    rate += TARIFF_SETTINGS.highValuePenalty;
+  }
+
+  // Clamp
+  return Math.min(TARIFF_SETTINGS.maxRate, Math.max(TARIFF_SETTINGS.minRate, rate));
 }
 
-function getExportTax(system, unitPrice, amount) {
-  const rate = systems[system]?.tariffs?.exportTaxRate || 0;
-  return unitPrice * amount * rate;
+function getExportTax(system, resource, unitPrice) {
+  const baseRate = TARIFF_SETTINGS.baseExport;
+  const market = systems[system]?.market?.[resource];
+  let rate = baseRate;
+
+  // Dynamic adjustment: exporting scarce resources
+  if (market) {
+    const scarcity = market.supply / (market.demand + 1);
+    rate += (1 - scarcity) * TARIFF_SETTINGS.dynamicAdjustmentFactor;
+  }
+
+  // Clamp
+  return Math.min(TARIFF_SETTINGS.maxRate, Math.max(TARIFF_SETTINGS.minRate, rate));
 }
+
+function calculateImportTax(system, resource, unitPrice, amount) {
+  const rate = getDynamicImportTaxRate(system, resource, unitPrice);
+  return { rate, tax: unitPrice * amount * rate };
+}
+
+function calculateExportTax(system, resource, unitPrice, amount) {
+  const rate = getDynamicExportTaxRate(system, resource, unitPrice);
+  return { rate, tax: unitPrice * amount * rate };
+}
+
 
 function getBuyTotal(system, unitPrice, amount) {
   const tax = getImportTax(system, unitPrice, amount);

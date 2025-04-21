@@ -13,6 +13,7 @@
   <!-- Custom Styles -->
   <link href="style.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <div id="atlas-scroll-wrapper">
 
@@ -46,14 +47,18 @@
       </div>
 
       <div class="nav-links">
-        <div class="nav-separator"></div>
-        
-        <button onclick="saveGameState(logToConsole = true)"><i class="fa fa-save"></i></button>
-        <button onclick="resetGameState()"><i class="fa fa-trash-o"></i></button>
-        <div class="nav-separator"></div>
-        <button id="openDevLogBtn"><i class="fa fa-code" aria-hidden="true"></i></button>
         <button id="openHelpBtn"><i class="fa fa-question-circle" aria-hidden="true"></i> | Help</button>
         <div class="nav-separator"></div>
+
+
+        <button onclick="saveGameState(logToConsole = true)"><i class="fa fa-save"></i>  | Save</button>
+        <button onclick="resetGameState()"><i class="fa fa-trash-o"></i>  | Reset Save</button>
+        <div class="nav-separator"></div>
+        <button id="openDevLogBtn"><i class="fa fa-code" aria-hidden="true"></i> | About</button>
+        <button onclick="window.open('https://discord.gg/grdKDt2sbV', '_blank')"><i class="fab fa-discord"></i> | Join the Discord</button>
+        <div class="nav-separator"></div>
+        
+
 
       </div>
     </nav>
@@ -187,7 +192,7 @@
             <b>Fuel:</b> <span class="text-warning" id="fuel">~</span><text class="text-warning">ᵣ</text> / 1000ᵣ<br>
             <text class="disabled">
               <b>Inventory:</b> <span id="inventoryCount">~</span>ᵣ</text><br>
-              <b>ΛΞ Vault:</b> <span id="vaultCount">~</span>ᵣ</text><br>
+            <b>ΛΞ Vault:</b> <span id="vaultCount">~</span>ᵣ</text><br>
             </text>
           </small>
         </section>
@@ -218,7 +223,8 @@
           <span id="sellbreakdown" style="display: none;">~</span>
 
           <div style="text-align: center;"><small><text> ~</text><span id="buybreakdown">~ </span> <span
-                style="font-size: 0.55rem; color: #dc3545;"><i class="fa fa-exclamation-triangle"aria-hidden="true"></i> | Estimate</span></small><br></div>
+                style="font-size: 0.55rem; color: #dc3545;"><i class="fa fa-exclamation-triangle"
+                  aria-hidden="true"></i> | Estimate</span></small><br></div>
 
           <div class="d-flex gap-2">
 
@@ -248,7 +254,8 @@
 
 
             <div class="d-flex justify-content-between align-items-center mb-2">
-              <h5 class="mb-0" style="font-size: medium;"><b>Current System: </b><span id="location2" class="resource-name mb-0">~</span></h5>
+              <h5 class="mb-0" style="font-size: medium;"><b>Current System: </b><span id="location2"
+                  class="resource-name mb-0">~</span></h5>
 
 
 
@@ -256,7 +263,8 @@
 
 
               <div id="viewModeButtons">
-                <button id="openTariffBtn" class="btn btn-outline-secondary">View Tax Rates</button>
+                <button onclick="openLeaderboard()" class="btn btn-outline-secondary">Stock Market</button>
+                <button id="openTariffBtn" class="btn btn-outline-secondary">Tax Rates</button>
 
 
 
@@ -283,22 +291,21 @@
 
             </div>
 
-            <div
-              style="margin-top: 0.85rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
-              <div>
-                <text style="color: #ffc107;">◤</text>
-                <span class="text-muted small">| System specializes in this resource.</span>
+            <div class="legend-bar">
+              <div class="legend-item">
+                <span class="legend-icon">◤</span>
+                <span class="legend-label"> | System specializes in this resource.</span>
               </div>
-              <div>
-                <span style="color: #ffc107;">X</span>
-                <span class="text-muted small">| Market data degrades over distance, expect some inaccuracies and corruption from
-                  further away systems.</span>
+              <div class="legend-item">
+                <span class="legend-icon">X</span>
+                <span class="legend-label"> | Market data degrades over distance — expect inaccuracies.</span>
               </div>
-              <div>
-                <span style="color: #ffc107;">N/A</span>
-                <span class="text-muted small">| No established market for this resource.</span>
+              <div class="legend-item">
+                <span class="legend-icon">N/A</span>
+                <span class="legend-label"> | No established market for this resource in this system.</span>
               </div>
             </div>
+            
         </section>
 
 
@@ -382,20 +389,31 @@
 
     <div id="tariffModal" class="modal" style="display: none;">
       <div class="modal-content tariff-scroll-modal">
-        <span id="closeTariffBtn" class="close">&times;</span>
-        <h2></i>Tax Rates</h2>
-        <table class="table table-sm table-dark table-bordered">
-          <thead>
-            <tr>
-              <th>System</th>
-              <th>Buy</th>
-              <th>Sell</th>
-            </tr>
-          </thead>
-          <tbody id="tariffTableBody"></tbody>
-        </table>
+        <div class="modal-header">
+          <h2>Tax Rates by System</h2>
+          <span id="closeTariffBtn" class="close">&times;</span>
+        </div>
+        <div id="market-scroll-wrapper" style="height: 900px; overflow-y: auto;">
+          <div class="modal-body">
+            <table class="tariff-table">
+              <thead>
+                <tr>
+                  <th>System</th>
+                  <th>Import Tariff <span class="unit">(Buy)</span></th>
+                  <th>Export Tariff <span class="unit">(Sell)</span></th>
+                </tr>
+              </thead>
+              <tbody id="tariffTableBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+        
       </div>
     </div>
+
 
     <div id="devLogModal" class="modal2warp" style="display: none;">
       <div class="modal-content galactic-style" style="width: 400px;">
@@ -405,12 +423,39 @@
           Thanks for checking out the game!
           <hr>
           This is a passion project I work on in spare moments — not a full-time thing, just something I tinker with for
-          fun. If you run into any bugs, have feedback or feature suggestions feel free to reach out on Discord:
-          <strong>@m6344</strong>
+          fun. If you run into any bugs, have feedback or feature suggestions feel free to reach out:
+          <strong><a href="https://discord.gg/grdKDt2sbV" target="_blank">Discord</a></strong>
         </p>
         Game Last Updated: <span class="greyed-out" id="last-updated">Loading...</span></h>
       </div>
     </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal" style="display: none;">
+      <div class="modal-content leaderboard-scroll">
+        <div class="modal-header">
+          <h2>Stock Market Rankings</h2>
+          <span class="close" onclick="closeLeaderboard()">×</span>
+        </div>
+        <div id="market-scroll-wrapper" style="height: 900px; overflow-y: auto;">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th style="text-align: center;"">#</th>
+                <th style="text-align: center;"">Corporation Name:</th>
+                <th style="text-align: center;">Share Price:</th>
+                <th style="text-align: center;"">Currently Operating in:</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody" style="text-align: center;"></tbody>
+          </table>
+
+        </div>
+      
+      </div>
+    </div>
+
+
 
 
 

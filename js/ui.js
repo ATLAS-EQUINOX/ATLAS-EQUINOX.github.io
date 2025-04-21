@@ -234,6 +234,27 @@ function sellBatch(resource, price) {
   );
 }
 
+function dumpBatch(resource, price) {
+  const batches = player.inventory[resource];
+  if (!batches) return;
+
+  const idx = batches.findIndex(([qty, paid]) => paid === price);
+  if (idx === -1) return;
+
+  const [qty] = batches[idx];
+  batches.splice(idx, 1);
+
+  if (batches.length === 0) {
+    delete player.inventory[resource];
+  }
+
+  log(`Jettisoned ${qty}${UNIT} of ${resource} (paid ${price.toFixed(2)}ᶜ) into the void.`);
+  logMarket(`<span class="text-warning">ΛTLΛS | ΞQUINOX™</span> dumped ${qty}${UNIT} of ${resource} @ ${price.toFixed(2)}ᶜ into space 🛰️`);
+
+  updateUI();
+}
+
+
 function updateInventoryDisplay() {
   const container = document.getElementById("inventoryItemsContainer");
   container.innerHTML = "";
@@ -262,6 +283,12 @@ function updateInventoryDisplay() {
     const resTitle = document.createElement("strong");
     resTitle.className = "text-warning";
     resTitle.textContent = res;
+    // Inside your inventory rendering loop:
+    const dumpBtn = document.createElement("button");
+    dumpBtn.textContent = "Dump batch";
+    dumpBtn.className = "btn btn-sm btn-outline-danger";
+    dumpBtn.onclick = () => dumpInventoryBatch(resource, index);
+
     const sellAllBtn = document.createElement("button");
     sellAllBtn.className = "sell-batch-btn";
     sellAllBtn.textContent = "Sell All";
@@ -277,14 +304,21 @@ function updateInventoryDisplay() {
     });
 
     Object.entries(grouped).forEach(([price, qty]) => {
-      const line = document.createElement("div"); // ✅ Define first
+      const line = document.createElement("div");
       line.className = "batch-line";
-
+    
       const infoSpan = document.createElement("span");
-      infoSpan.textContent = `${qty}${UNIT}  |  ${parseFloat(price).toFixed(
-        2
-      )}ᶜ`;
-
+      infoSpan.textContent = `${qty}${UNIT}  |  ${parseFloat(price).toFixed(2)}ᶜ`;
+    
+      // 🆕 Dump button
+      const dumpBtn = document.createElement("button");
+      dumpBtn.className = "sell-batch-btn";
+      dumpBtn.textContent = "Dump Batch";
+      dumpBtn.onclick = () => {
+        dumpBatch(res, parseFloat(price));
+        updateUI();
+      };
+    
       const moveBtn = document.createElement("button");
       moveBtn.className = "move-batch-btn btn-sm";
       moveBtn.textContent = "↪ Move to Vault";
@@ -292,7 +326,7 @@ function updateInventoryDisplay() {
         moveBatch(res, parseFloat(price), qty, "inventory", "vault");
         updateUI();
       };
-
+    
       const sellBtn = document.createElement("button");
       sellBtn.className = "sell-batch-btn";
       sellBtn.textContent = "Sell Batch";
@@ -304,13 +338,15 @@ function updateInventoryDisplay() {
           updateUI();
         }, 100);
       };
-
+    
       line.appendChild(infoSpan);
 
       line.appendChild(moveBtn);
       line.appendChild(sellBtn);
+      line.appendChild(dumpBtn);
       resDiv.appendChild(line);
     });
+    
 
     const marketPrice = systems[player.location]?.prices[res] || 0;
     const resValue = batches.reduce((sum, [qty]) => sum + qty * marketPrice, 0);
@@ -818,3 +854,93 @@ function renderTariffModal() {
     tbody.appendChild(tr);
   });
 }
+
+function openLeaderboard() {
+  renderLeaderboard();
+  document.getElementById("leaderboardModal").style.display = "block";
+}
+
+function closeLeaderboard() {
+  document.getElementById("leaderboardModal").style.display = "none";
+}
+
+function getCorpNetWorth(corp) {
+  let worth = corp.credits || 0;
+
+  if (corp.inventory) {
+    for (const [resource, batches] of Object.entries(corp.inventory)) {
+      const marketPrice = systems[corp.location]?.prices?.[resource] || RESOURCE_DATA[resource].base;
+      for (const [qty] of batches) {
+        worth += qty * marketPrice;
+      }
+    }
+  }
+
+  return parseFloat(worth.toFixed(2));
+}
+
+function renderLeaderboard() {
+  const tbody = document.getElementById("leaderboardBody");
+  tbody.innerHTML = "";
+
+  const SHARES_ISSUED = 1000;
+  const historyKey = "atlasFtseShareHistory";
+  const prevHistory = JSON.parse(localStorage.getItem(historyKey) || "{}");
+
+  const allCorps = Object.entries(corporations)
+    .concat([["ATLAS | EQUINOX", player]])
+    .map(([name, corp]) => {
+      const netWorth = getCorpNetWorth(corp);
+
+      // More realistic scaling: diminishing returns for megacorps
+      const adjustedWorth = Math.pow(netWorth, 0.95); // logish compression
+      const sharePrice = adjustedWorth / SHARES_ISSUED;
+
+      const prevPrice = prevHistory[name] ?? sharePrice;
+      const change = sharePrice - prevPrice;
+      const changePercent = (change / prevPrice) * 100;
+
+      // Store new price in history
+      prevHistory[name] = sharePrice;
+
+      return {
+        name,
+        netWorth,
+        sharePrice,
+        prevPrice,
+        change,
+        changePercent,
+        location: corp.location || "Unknown",
+      };
+    })
+    .sort((a, b) => b.sharePrice - a.sharePrice);
+
+  // Save updated history
+  localStorage.setItem(historyKey, JSON.stringify(
+    Object.fromEntries(allCorps.map(c => [c.name, c.sharePrice]))
+  ));
+
+  allCorps.forEach((corp, index) => {
+    const row = document.createElement("tr");
+    const isPlayer = corp.name === "ATLAS | EQUINOX";
+    row.className = isPlayer ? "player-corp-row" : "";
+
+    const arrow = corp.change > 0 ? "▲" : corp.change < 0 ? "▼" : "→";
+    const arrowColor = corp.change > 0 ? "text-success" : corp.change < 0 ? "text-danger" : "text-muted";
+
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td><strong>${corp.name}</strong></td>
+      <td title="Net Worth: ${corp.netWorth.toFixed(2)}ᶜ">
+        <span class="${arrowColor}">${arrow}</span>
+        ${corp.sharePrice.toFixed(2)}ᶜ
+        <small class="${arrowColor}">(${corp.changePercent.toFixed(2)}%)</small>
+      </td>
+      <td>${corp.location}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+
+

@@ -259,3 +259,15 @@ const npcCorporations = [
     "ZΞNITH ORBITΛLS",
     "Zorl'Nex Syndicate",
 ];
+
+
+const TARIFF_SETTINGS = {
+    baseImport: 0.06,
+    baseExport: 0.04,
+    minRate: 0.01,
+    maxRate: 0.25,
+    dynamicAdjustmentFactor: 0.02, // per unit of supply/demand imbalance
+    highValueThreshold: 500,
+    highValuePenalty: 0.02,
+};
+  

@@ -999,11 +999,27 @@ body.modal-open {
 .tariff-scroll-modal {
     max-height: 80vh;
     overflow-y: auto;
-    background-color: #111;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, .6);
-    color: #fff
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 20px;
+    color: #eee;
+}
+
+.tariff-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.tariff-table thead {
+    background-color: #222;
+}
+
+.tariff-table th,
+.tariff-table td {
+    padding: 10px;
+    border: 1px solid #333;
 }
 
 .dark-modal .modal-content {
@@ -1271,4 +1287,78 @@ body, html {
     padding-top: 5px;
     border-radius: 1px;
 }
+
+.leaderboard-scroll {
+    max-height: 80vh;
+    overflow-y: auto;
+    background: #101010;
+    border-radius: 12px;
+    padding: 20px;
+    color: #fff;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+    padding: 12px;
+    border-bottom: 1px solid #333;
+    text-align: center;
+}
+
+
+
+.leaderboard-table tbody tr:hover {
+    background-color: #1e1e1e;
+}
+
+.player-corp-row {
+    background-color: #272727 !important;
+    font-weight: bold;
+    color: #ffc107;
+    border-left: 4px solid #ffc107;
+}
+
+.leaderboard-table td:nth-child(3) {
+    color: #ffc107;
+    font-family: monospace;
+}
+
+.legend-bar {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid #333;
+    background-color: #111;
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+  }
+  
+  .legend-icon {
+    color: #ffc107;
+
+  }
+  
+  .legend-label {
+    color: #bbb;
+  }
+  
+
+
+
+  
 
