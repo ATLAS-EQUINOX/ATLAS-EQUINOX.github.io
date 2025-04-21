@@ -151,6 +151,11 @@ th.highest-spread {
   border: 1px solid #444; /* inner grid lines */
 }
 
+#marketTable td:first-child {
+    font-size: 0.7rem;
+
+}
+
 
 
 
@@ -1078,7 +1083,7 @@ body.modal-open {
 
 #atlas-scroll-wrapper {
     width: 1920px;
-    height: 1080px;
+    height: auto;
     overflow: hidden;
     margin: 0 auto
 }

@@ -581,7 +581,7 @@ function updateMarketTable() {
   }
 
   function formatEstimate(val, hops) {
-    if (hops === null || hops > 12) return "⚠";
+    if (hops === null || hops > 12) return "X";
 
     if (hops <= 7) return val.toFixed(2);
     if (hops === 9) return val.toFixed(1);
@@ -610,13 +610,13 @@ function updateMarketTable() {
       const hops = path ? path.length - 1 : null;
 
       const display = formatEstimate(price, hops);
-      const isCorrupted = display === "⚠";
+      const isCorrupted = display === "X";
 
       if (!market || price === undefined || isCorrupted) {
         cell.className = "text-muted text-center unavailable-cell";
         cell.innerHTML = isCorrupted
-          ? `⚠?!`
-          : "—";
+          ? `X`
+          : "N/A";
       } else {
         const trend = lastPrices[`${system}-${res}`]?.trend ?? "same";
 
@@ -634,8 +634,8 @@ function updateMarketTable() {
 
         const display = formatEstimate(price, hops);
         const displayHTML =
-          display === "⚠"
-            ? `⚠`
+          display === "⦵"
+            ? `⦵`
             : display;
 
         cell.innerHTML = `
@@ -687,15 +687,16 @@ function updateMarketHeading() {
   // First column: System
   let sortIcon = "";
   if (sortState.column === "System") {
-    sortIcon = sortState.ascending ? " ↑" : " ↓";
+    sortIcon = sortState.ascending ? "" : "";
   }
   headerRow.innerHTML = `<th onclick="sortBy('System')">System${sortIcon}</th>`;
+
 
   // Resource columns
   RESOURCE_TYPES.forEach((res) => {
     let icon = "";
     if (sortState.column === res) {
-      icon = sortState.ascending ? " ↑" : " ↓";
+      icon = sortState.ascending ? "" : "";
     }
     const th = document.createElement("th");
     th.innerHTML = `${res}${icon}`;
