@@ -121,6 +121,26 @@ function loadGameState() {
   }
 }
 
+
+function saveContracts() {
+  localStorage.setItem("activeContracts", JSON.stringify(activeContracts));
+}
+
+function loadContracts() {
+  const data = localStorage.getItem("activeContracts");
+  if (data) {
+    activeContracts = JSON.parse(data);
+
+    // Restore Date objects and defaults
+    activeContracts.forEach(c => {
+      if (!c.issuedAt && c.status === "accepted") c.issuedAt = Date.now();
+    });
+  }
+}
+
+
+
+
 function resetGameState() {
   if (
     !confirm("Are you sure you want to reset your save? This cannot be undone.")

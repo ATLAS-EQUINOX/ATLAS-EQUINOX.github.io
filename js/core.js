@@ -111,6 +111,12 @@ function initGame() {
 
   document.getElementById("travelSearch").addEventListener("change", toggleTravelButton);
 
+  window.addEventListener("DOMContentLoaded", () => {
+    loadContracts();
+    renderAvailableContracts();
+    renderActiveContracts();
+  });
+
 
 
 
@@ -250,7 +256,6 @@ function updateUI() {
   updateSellButton();
   updateMarketHeading();
   updateMarketTable(); // big one: we'll optimize this next
-  randomizeGlitchDelays();
   updatePlayerNetWorth();
   updateHighScoreDisplay();
 
@@ -294,6 +299,9 @@ function tick() {
     }
     npcLastTick = now;
   }
+
+
+
 
   setInterval(() => {
     renderActiveContracts();

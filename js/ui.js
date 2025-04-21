@@ -537,13 +537,6 @@ function updateStorageUsage() {
   }
 }
 
-function randomizeGlitchDelays() {
-  document.querySelectorAll(".glitch-effect").forEach((el) => {
-    const delay = (Math.random() * 2).toFixed(2); // 0.00 to 2.00s
-    el.style.animationDelay = `${delay}s`;
-  });
-}
-
 function updateMarketTable() {
   const table = document.getElementById("marketTable");
   if (!table) return;
@@ -588,7 +581,7 @@ function updateMarketTable() {
   }
 
   function formatEstimate(val, hops) {
-    if (hops === null || hops > 12) return "∅";
+    if (hops === null || hops > 12) return "⚠";
 
     if (hops <= 7) return val.toFixed(2);
     if (hops === 9) return val.toFixed(1);
@@ -617,12 +610,12 @@ function updateMarketTable() {
       const hops = path ? path.length - 1 : null;
 
       const display = formatEstimate(price, hops);
-      const isCorrupted = display === "∅";
+      const isCorrupted = display === "⚠";
 
       if (!market || price === undefined || isCorrupted) {
         cell.className = "text-muted text-center unavailable-cell";
         cell.innerHTML = isCorrupted
-          ? `<span class="glitch-effect" data-text="">∅</span>`
+          ? `⚠?!`
           : "—";
       } else {
         const trend = lastPrices[`${system}-${res}`]?.trend ?? "same";
@@ -641,8 +634,8 @@ function updateMarketTable() {
 
         const display = formatEstimate(price, hops);
         const displayHTML =
-          display === "∅"
-            ? `<span class="glitch-effect" data-text="">∅</span>`
+          display === "⚠"
+            ? `⚠`
             : display;
 
         cell.innerHTML = `

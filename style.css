@@ -26,11 +26,6 @@ body, html {
     overflow: hidden;
 }
 
-.supply-demand-info {
-    font-size: .57em;
-    text-align: center;
-    font-family: Helvetica;
-}
 
 th.highest-spread {
     color: rgb(0, 255, 106) !important;
@@ -129,13 +124,14 @@ th.highest-spread {
 }
 
 .specialized-cell::after {
-    content: '⏣'; /* Unicode for alembic (flask) */
+    content: '◤'; /* Unicode for alembic (flask) */
     position: absolute;
-    top: 2px;
-    left: 2px;
-    font-size: 0.5em;
+    top: 1px;
+    left: 1px;
+    font-size: 0.7em;
     color: #ffc107;
     pointer-events: none;
+
 }
 
 
@@ -598,17 +594,18 @@ th:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #000;
+    background-color: #000000;
     padding: .6rem 1.2rem;
     border-bottom: 1px solid #2d2d2e;
     font-family: Arial, sans-serif;
-    z-index: 100
+    z-index: 100;
+
 }
 
 .nav-logo {
-    color: #fff;
+    color: #ffffff;
     font-weight: 700;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     text-shadow: 0 0 6px #ffffff46
 }
 
@@ -625,9 +622,9 @@ th:hover {
 }
 
 .nav-links button:hover {
-    background-color: rgba(255, 255, 255, .1);
-    color: #fff;
-    border-color: #fff
+    background-color: #ffc107;
+    color: #000000;
+    border-color: #000000
 }
 
 .expandable {
@@ -1079,115 +1076,6 @@ body.modal-open {
     display: none
 }
 
-.glitch-effect {
-    position: relative;
-    display: inline-block;
-    color: #ffc107;
-    font-weight: 700;
-    text-shadow: 0 0 2px #ffc107, 1px 0 #555, -1px 0 #000;
-    background: 0 0 !important;
-    padding: 0;
-    animation: glitch-move 1s infinite linear alternate
-}
-
-.glitch-effect::after, .glitch-effect::before {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: 0 0;
-    color: #ffc107;
-    font-weight: 700;
-    pointer-events: none
-}
-
-.glitch-effect::after {
-    left: 2px;
-    text-shadow: -1px 0 #303030;
-    animation: glitch-1 2s infinite linear alternate-reverse
-}
-
-.glitch-effect::before {
-    left: -2px;
-    text-shadow: 1px 0 #ffc107;
-    animation: glitch-2 2s infinite linear alternate-reverse
-}
-
-@keyframes glitch-move {
-    0%, 100% {
-        transform: translate(0, 0)
-    }
-
-    20% {
-        transform: translate(-1px, 1px)
-    }
-
-    40% {
-        transform: translate(1px, -1px)
-    }
-
-    60% {
-        transform: translate(-1px, 0)
-    }
-
-    80% {
-        transform: translate(1px, 1px)
-    }
-}
-
-@keyframes glitch-1 {
-    0% {
-        clip: rect(20px, 9999px, 21px, 0)
-    }
-
-    10% {
-        clip: rect(0, 9999px, 5px, 0)
-    }
-
-    20% {
-        clip: rect(30px, 9999px, 60px, 0)
-    }
-
-    30% {
-        clip: rect(15px, 9999px, 35px, 0)
-    }
-
-    40% {
-        clip: rect(10px, 9999px, 50px, 0)
-    }
-
-    100% {
-        clip: rect(25px, 9999px, 55px, 0)
-    }
-}
-
-@keyframes glitch-2 {
-    0% {
-        clip: rect(15px, 9999px, 25px, 0)
-    }
-
-    10% {
-        clip: rect(5px, 9999px, 20px, 0)
-    }
-
-    20% {
-        clip: rect(25px, 9999px, 35px, 0)
-    }
-
-    30% {
-        clip: rect(0, 9999px, 10px, 0)
-    }
-
-    40% {
-        clip: rect(20px, 9999px, 40px, 0)
-    }
-
-    100% {
-        clip: rect(10px, 9999px, 30px, 0)
-    }
-}
-
 #atlas-scroll-wrapper {
     width: 1920px;
     height: 1080px;
@@ -1372,3 +1260,10 @@ body, html {
 .main-and-console {
     flex: 1
 }
+
+.supply-demand-info {
+    font-size: 0.62em;
+    padding-top: 5px;
+    border-radius: 1px;
+}
+

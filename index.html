@@ -38,7 +38,7 @@
 
     <nav class="top-nav d-flex justify-content-between align-items-center p-2">
       <div class="d-flex align-items-center gap-3">
-        <img src="./images/white.png" alt="ATLAS Logo" id="logoImage" style="height: 60px;" />
+        <img src="./images/white.png" alt="ATLAS Logo" id="logoImage" style="height: 50px;" />
         <div class="nav-logo">
           <strong>ΛTLΛS | ΞQUINOX™</strong><br>
           <small>An Interstellar Trading Company</small>
@@ -47,11 +47,12 @@
 
       <div class="nav-links">
         <div class="nav-separator"></div>
-        <button id="openHelpBtn"><i class="fa fa-question-circle" aria-hidden="true"></i> | Help</button>
-        <button onclick="saveGameState(logToConsole = true)"><i class="fa fa-save"></i> | Save</button>
-        <button onclick="resetGameState()"><i class="fa fa-trash-o"></i> | Reset Save</button>
+        
+        <button onclick="saveGameState(logToConsole = true)"><i class="fa fa-save"></i></button>
+        <button onclick="resetGameState()"><i class="fa fa-trash-o"></i></button>
         <div class="nav-separator"></div>
         <button id="openDevLogBtn"><i class="fa fa-code" aria-hidden="true"></i></button>
+        <button id="openHelpBtn"><i class="fa fa-question-circle" aria-hidden="true"></i> | Help</button>
         <div class="nav-separator"></div>
 
       </div>
@@ -286,12 +287,12 @@
             <div
               style="margin-top: 0.85rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
               <div>
-                <text style="color: #ffc107;">⏣</text>
+                <text style="color: #ffc107;">◤</text>
                 <span class="text-muted small">| System specializes in this resource.</span>
               </div>
               <div>
-                <span style="color: #ffffff;" class="glitch-effect" data-text="">∅</span>
-                <span class="text-muted small">| Market data degrades over distance, expect some inaccuracies from
+                <span style="color: #ffc107;">⚠?!</span>
+                <span class="text-muted small">| Market data degrades over distance, expect some inaccuracies and corruption from
                   further away systems.</span>
               </div>
             </div>
