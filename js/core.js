@@ -412,6 +412,9 @@ window.onload = function () {
     document.getElementById("devLogModal").style.display = "none";
   });
 
+  document.getElementById("leaderboardBtn").addEventListener("click", openLeaderboard);
+
+
   window.addEventListener("click", (e) => {
     const modal = document.getElementById("devLogModal");
     if (e.target == modal) {
