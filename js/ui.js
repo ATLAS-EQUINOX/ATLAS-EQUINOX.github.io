@@ -291,7 +291,7 @@ function updateInventoryDisplay() {
 
     const sellAllBtn = document.createElement("button");
     sellAllBtn.className = "sell-batch-btn";
-    sellAllBtn.textContent = "Sell All";
+    sellAllBtn.textContent = "Sell Resource";
     sellAllBtn.onclick = () => {
       sellAllOfResource(res);
     };
