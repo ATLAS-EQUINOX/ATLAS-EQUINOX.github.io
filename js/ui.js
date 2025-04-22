@@ -321,7 +321,7 @@ function updateInventoryDisplay() {
     
       const moveBtn = document.createElement("button");
       moveBtn.className = "move-batch-btn btn-sm";
-      moveBtn.textContent = "↪ Move to Vault";
+      moveBtn.textContent = "Move to Vault";
       moveBtn.onclick = () => {
         moveBatch(res, parseFloat(price), qty, "inventory", "vault");
         updateUI();
@@ -425,7 +425,7 @@ function updateVaultDisplay() {
 
       const moveBtn = document.createElement("button");
       moveBtn.className = "move-batch-btn2 btn-sm";
-      moveBtn.textContent = "↩ Move to Inventory";
+      moveBtn.textContent = "Move to Inventory";
       moveBtn.onclick = () => {
         moveBatch(res, parseFloat(price), qty, "vault", "inventory");
         updateUI();
