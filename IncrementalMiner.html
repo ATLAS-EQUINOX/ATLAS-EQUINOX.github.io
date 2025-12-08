@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Incremental Miner</title>
+
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=VT323&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    </noscript>
+
+    <link rel="stylesheet" href="styleIM.css">
+</head>
+<body>
+<div class="app" role="application" aria-label="Atlas Equinox Incremental Game">
+
+    <header>
+        <h1>[ Incremental Miner ]</h1>
+        <div class="topline">
+            <button id="saveBtn" class="save-btn" type="button" aria-label="Save current game progress">SAVE NOW</button>
+            <button id="resetBtn" class="save-btn" type="button" 
+                    style="color: var(--error-color); border-color: var(--error-color);"
+                    aria-label="Wipe all progress and restart game">Reset Save
+
+            </button>
+        </div>
+    </header>
+
+    <main class="main-content"> <section class="col-left" aria-label="Deployed Units and Production Statistics">
+            <div class="panel production-stats-panel">
+                <h3>Deployed Units:</h3> <dl class="stat-list">
+                    <div class="stat small"><dt>Drones:</dt> <dd><strong id="miners">0</strong></dd></div>
+                    <div class="stat small"><dt>Heavy Drills:</dt> <dd><strong id="drills">0</strong></dd></div>
+                    <div class="stat small"><dt>Factories:</dt> <dd><strong id="factories">0</strong></dd></div>
+                    <div class="stat small"><dt>Haulers:</dt> <dd><strong id="rockets">0</strong></dd></div>
+                    <div class="stat small"><dt>Ore Fabricators:</dt> <dd><strong id="autofabs">0</strong></dd></div>
+                    <div class="stat small"><dt>Stargates:</dt> <dd><strong id="stargates">0</strong></dd></div>
+                </dl>
+            </div>
+        </section>
+
+        <div class="col-center">
+            <section class="panel resource-big" aria-label="Ore Management and Resources">
+                <div class="resource-data-group">
+                    <h3>Ore:</h3> <div id="oreCount" class="ore-display" aria-live="polite" aria-atomic="true">0</div>
+                        <div class="resource-meta-grid">
+                            <div><label>Total Ore Mined:</label> <span id="totalMined">0</span></div>
+                            <div><label>Ore Per Second:</label> <span id="ops">0</span></div>
+                            <div><label>Ore Per Manual Click:</label> <span id="orePerClick">1</span></div>
+                            <div><label>Credit Balance:</label> <span id="creditsTop">0</span></div>
+                        </div>
+
+                </div>
+                
+                <div class="button-group">
+                    <button id="mineBtn" class="mine-btn" type="button"> | Mine | </button>
+                    <button id="sellBtn" class="mine-btn sell-all-btn" type="button"> | SELL All | </button>
+                </div>
+
+                <div class="small muted auto-sell-group">
+                    <label for="autoSellToggle" style="margin-right: 15px;">
+                        <input type="checkbox" id="autoSellToggle"> Auto-Sell
+                    </label>
+                    
+                    <label>Threshold: <span id="autoSellLimit">10000</span></label>
+
+                    <div style="margin-top: 5px; width: 50%;">
+                        <label for="autoSellSlider" class="sr-only">Auto-Sell Limit Slider</label> <input type="range" id="autoSellSlider" min="2" max="10" step="0.01" value="1" style="width: 90%; margin-left: 0%;">
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel tab-card" aria-label="Upgrades and Production Tabs">
+                <div class="tab-header">
+                    <button class="tab-btn" data-tab="automated">Automated Production</button>
+                    <button class="tab-btn active" data-tab="permanent">Permanent Upgrades</button>
+
+                </div>
+
+                <div class="tab-content">
+                    <div id="automated" class="tab-panel">
+
+                        <div class="shop" id="shop" role="list"></div>
+                    </div>
+
+                    <div id="permanent" class="tab-panel active">
+
+                        <div class="shop" id="upgrades" role="list"></div>
+                    </div>
+
+
+                </div>
+            </section>
+            
+        </div>
+
+    </main>
+</div>
+
+<script src="js.js" defer></script>
+</body>
+</html>
