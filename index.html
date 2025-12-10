@@ -47,7 +47,6 @@
         <button onclick="resetGameState()"><i class="fa fa-trash-o"></i>  | Reset Save</button>
         <div class="nav-separator"></div>
         <button id="openDevLogBtn"><i class="fa fa-code" aria-hidden="true"></i> | About</button>
-        <button onclick="window.open('https://discord.gg/grdKDt2sbV', '_blank')"><i class="fab fa-discord"></i> | Join the Discord</button>
         <div class="nav-separator"></div>
         
 
@@ -361,18 +360,13 @@
           <div class="tab-pane fade" id="contracts" role="tabpanel">
             <section class="console-wrapper flex-fill">
               <h6>Active Contracts:</h6>
-              <div id="activeContractsContainer" class="d-flex flex-column gap-2 mb-3"></div>
+              <div id="acceptedContractsContainer" class="d-flex flex-column gap-2 mb-3"></div>
             </section>
 
             <section class="console-wrapper flex-fill">
               <h6>Available Contracts:</h6>
               <div id="contractsContainer" class="d-flex flex-column gap-2"></div>
             </section>
-          </div>
-
-
-          <div class="tab-pane fade" id="Investments" role="tabpanel">
-            <section class="console-wrapper flex-fill">
           </div>
 
 
@@ -418,7 +412,8 @@
           <hr>
           This is a passion project I work on in spare moments — not a full-time thing, just something I tinker with for
           fun. If you run into any bugs, have feedback or feature suggestions feel free to reach out:
-          <strong><a href="https://discord.gg/grdKDt2sbV" target="_blank">Discord</a></strong>
+          <i class="fab fa-discord"> @m6344</i>
+          
         </p>
         Game Last Updated: <span class="greyed-out" id="last-updated">Loading...</span></h>
       </div>

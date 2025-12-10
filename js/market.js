@@ -97,24 +97,52 @@ function getBuySellPrice(basePrice) {
 }
 
 
-function getImportTax(system, resource, unitPrice) {
-  const baseRate = TARIFF_SETTINGS.baseImport;
-  const market = systems[system]?.market?.[resource];
-  let rate = baseRate;
+// 🆕 Must update getImportTax/getExportTax signature to accept 'amount'
+function getImportTax(system, resource, unitPrice, amount) { // 👈 ADDED 'amount'
+    const baseRate = TARIFF_SETTINGS.baseImport;
+    const market = systems[system]?.market?.[resource];
+    let rate = baseRate;
 
-  // Dynamic adjustment
-  if (market) {
-    const imbalance = (market.demand - market.supply) / (market.supply + 1);
-    rate += imbalance * TARIFF_SETTINGS.dynamicAdjustmentFactor;
-  }
+    // Dynamic adjustment (retained)
+    if (market) {
+        const imbalance = (market.demand - market.supply) / (market.supply + 1);
+        rate += imbalance * TARIFF_SETTINGS.dynamicAdjustmentFactor;
+    }
 
-  // High-value goods penalty
-  if (unitPrice > TARIFF_SETTINGS.highValueThreshold) {
-    rate += TARIFF_SETTINGS.highValuePenalty;
-  }
+    // High-value goods penalty (retained)
+    if (unitPrice > TARIFF_SETTINGS.highValueThreshold) {
+        rate += TARIFF_SETTINGS.highValuePenalty;
+    }
 
-  // Clamp
-  return Math.min(TARIFF_SETTINGS.maxRate, Math.max(TARIFF_SETTINGS.minRate, rate));
+    // 💥 NEW: Volume Surcharge (e.g., above 500 units)
+    const VOLUME_THRESHOLD = 500; // Define this in TARIFF_SETTINGS or here
+    if (amount > VOLUME_THRESHOLD) {
+        const volumeFactor = amount / VOLUME_THRESHOLD;
+        // Punish large trades with an escalating penalty
+        rate += TARIFF_SETTINGS.volumePenalty * (volumeFactor ** 1.5); 
+    }
+
+    // Clamp
+    return Math.min(TARIFF_SETTINGS.maxRate, Math.max(TARIFF_SETTINGS.minRate, rate));
+}
+
+// 🆕 You must also update getExportTax to take 'amount' if you want this tax to apply to player sales.
+function getExportTax(system, resource, unitPrice, amount) { // 👈 ADDED 'amount'
+    const baseRate = TARIFF_SETTINGS.baseExport;
+    const market = systems[system]?.market?.[resource];
+    let rate = baseRate;
+
+    // ... [other calculations]
+
+    // 💥 NEW: Volume Surcharge on Export
+    const VOLUME_THRESHOLD = 500;
+    if (amount > VOLUME_THRESHOLD) {
+        const volumeFactor = amount / VOLUME_THRESHOLD;
+        rate += TARIFF_SETTINGS.volumePenalty * (volumeFactor ** 1.5); 
+    }
+    
+    // Clamp
+    return Math.min(TARIFF_SETTINGS.maxRate, Math.max(TARIFF_SETTINGS.minRate, rate));
 }
 
 function getExportTax(system, resource, unitPrice) {
@@ -142,93 +170,88 @@ function calculateExportTax(system, resource, unitPrice, amount) {
   return { rate, tax: unitPrice * amount * rate };
 }
 
-
-function getBuyTotal(system, unitPrice, amount) {
-  const tax = getImportTax(system, unitPrice, amount);
-  return { tax, total: unitPrice * amount + tax };
+// 🆕 Update getBuyTotal/getSellTotal signatures and calls
+function getBuyTotal(system, resource, unitPrice, amount) {
+    const rate = getImportTax(system, resource, unitPrice, amount); // 👈 PASS amount
+    const tax = unitPrice * amount * rate; // 👈 Calculate tax here
+    return { tax, total: unitPrice * amount + tax };
 }
 
-function getSellTotal(system, unitPrice, amount) {
-  const tax = getExportTax(system, unitPrice, amount);
-  return { tax, total: unitPrice * amount - tax };
+function getSellTotal(system, resource, unitPrice, amount) {
+    const rate = getExportTax(system, resource, unitPrice, amount); // 👈 PASS amount
+    const tax = unitPrice * amount * rate; // 👈 Calculate tax here
+    return { tax, total: unitPrice * amount - tax };
 }
+// Note: This replaces the previous simplified logic which assumed tax was calculated in getImportTax/getExportTax.
 
 function updateMarket() {
-  const savedPriceData = JSON.parse(
-    localStorage.getItem("atlasPriceHistory") || "{}"
-  );
-  SYSTEM_NAMES.forEach((system) => {
-    RESOURCE_TYPES.forEach((res) => {
-      const key = `${system}-${res}`;
-      const oldPrice =
-        systems[system].prices[res] ?? getTimeSeededPrice(system, res);
-      const newPrice = getTimeSeededPrice(system, res);
-      let trend = "same";
-      if (newPrice > oldPrice) trend = "up";
-      else if (newPrice < oldPrice) trend = "down";
-      // 🔥 Only update the trend if price changed
-      lastPrices[key] = {
-        price: newPrice,
-        trend,
-        timestamp: Date.now(),
-      };
-      systems[system].prices[res] = newPrice;
-      savedPriceData[key] = newPrice;
-    });
-  });
-  // 🧠 Log best arbitrage tip only once per market refresh
-  let bestResource = null;
-  let bestProfit = 0;
-  let bestLow = 0;
-  let bestHigh = 0;
-  RESOURCE_TYPES.forEach((res) => {
-    const prices = SYSTEM_NAMES.map((system) => systems[system].prices[res]);
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-    const profit = max - min;
-    if (profit > bestProfit) {
-      bestProfit = profit;
-      bestResource = res;
-      bestLow = min;
-      bestHigh = max;
-    }
-  });
-  if (bestProfit > 0) {
-    logMarket(
-      `Anonymous tip: Buy  ${bestResource}  at <span class="text-success">${bestLow.toFixed(
-        2
-      )}ᶜ</span>, sell at <span class="text-danger">${bestHigh.toFixed(
-        2
-      )}ᶜ</span>. Potential profit: <span class="text-warning">+${(
-        bestHigh - bestLow
-      ).toFixed(2)}ᶜ</span>`
+    // 1. Load existing price data cache
+    const savedPriceData = JSON.parse(
+        localStorage.getItem("atlasPriceHistory") || "{}"
     );
-  }
 
-  localStorage.setItem("atlasPriceHistory", JSON.stringify(savedPriceData));
-  const historyStore = JSON.parse(
-    localStorage.getItem("atlasPriceHistoryGraph") || "{}"
-  );
-
-  RESOURCE_TYPES.forEach((res) => {
+    // 2. Recalculate and update prices for all systems and resources
     SYSTEM_NAMES.forEach((system) => {
-      const key = `${system}-${res}`;
-      const newPrice = systems[system].prices[res];
-      if (!newPrice) return;
+        RESOURCE_TYPES.forEach((res) => {
+            const key = `${system}-${res}`;
+            
+            // Get the old price (for trend calculation) and calculate the new time-seeded price
+            const oldPrice =
+                systems[system].prices[res] ?? getTimeSeededPrice(system, res);
+            const newPrice = getTimeSeededPrice(system, res);
 
-      historyStore[key] ||= [];
-      historyStore[key].push({ time: Date.now(), price: newPrice });
-
-      // Optional: cap history length
-      if (historyStore[key].length > 100) {
-        historyStore[key] = historyStore[key].slice(-100);
-      }
+            // Determine price trend
+            let trend = "same";
+            if (newPrice > oldPrice) trend = "up";
+            else if (newPrice < oldPrice) trend = "down";
+            
+            // Update lastPrices cache for UI rendering/flashing
+            lastPrices[key] = {
+                price: newPrice,
+                trend,
+                timestamp: Date.now(),
+            };
+            
+            // Apply the new price to the main system data structure
+            systems[system].prices[res] = newPrice;
+            savedPriceData[key] = newPrice;
+        });
     });
-  });
 
-  localStorage.setItem("atlasPriceHistoryGraph", JSON.stringify(historyStore));
+    // 3. ENFORCING INFORMATION ASYMMETRY: Removed the "Anonymous tip" feature.
+    // The player must now compare prices manually or use the in-game market table/history.
+    
+    // 4. Save the immediate price data
+    localStorage.setItem("atlasPriceHistory", JSON.stringify(savedPriceData));
 
-  updateUI();
+    // 5. Update Historical Price Graph Data
+    const historyStore = JSON.parse(
+        localStorage.getItem("atlasPriceHistoryGraph") || "{}"
+    );
+
+    // Iterating over all prices again to update the historical graph data is necessary
+    // but consider if this must run on every market update. If the market updates frequently
+    // (e.g., every 10 seconds), you might want to throttle the history storage.
+    RESOURCE_TYPES.forEach((res) => {
+        SYSTEM_NAMES.forEach((system) => {
+            const key = `${system}-${res}`;
+            const newPrice = systems[system].prices[res];
+            if (!newPrice) return;
+
+            historyStore[key] ||= [];
+            historyStore[key].push({ time: Date.now(), price: newPrice });
+
+            // Cap history length (retained)
+            if (historyStore[key].length > 100) {
+                historyStore[key] = historyStore[key].slice(-100);
+            }
+        });
+    });
+
+    localStorage.setItem("atlasPriceHistoryGraph", JSON.stringify(historyStore));
+
+    // 6. Trigger UI update
+    updateUI();
 }
 
 function logMarket(msg) {
@@ -258,172 +281,207 @@ function logMarket(msg) {
 }
 
 function sellAllMaterials() {
-  let totalRevenue = 0;
-  let soldItems = [];
-  const location = player.location;
-  const tariffs = systems[location]?.tariffs || { exportTaxRate: 0 };
+    let totalRevenue = 0;
+    let soldItems = [];
+    const location = player.location;
 
-  for (let resource in player.inventory) {
-    const batches = player.inventory[resource];
-    if (!batches || batches.length === 0) continue;
+    for (let resource in player.inventory) {
+        const batches = player.inventory[resource];
+        if (!batches || batches.length === 0) continue;
 
-    let quantity = 0;
-    let totalPaid = 0;
+        // --- Split allowed vs blocked batches ---
+        const allowedBatches = batches.filter(([qty, paid, origin]) => origin !== location);
+        const blockedBatches = batches.filter(([qty, paid, origin]) => origin === location);
 
-    batches.forEach(([qty, paid]) => {
-      quantity += qty;
-      totalPaid += qty * paid;
-    });
+        const blockedQty = blockedBatches.reduce((s, [q]) => s + q, 0);
+        if (blockedQty > 0) {
+            log(
+                `You cannot sell ${blockedQty}${UNIT} of ${resource} in ${location} because it was purchased here.`
+            );
+        }
 
-    const price =
-      systems[location]?.prices[resource] || RESOURCE_DATA[resource]?.base || 0;
-    const exportTax = price * quantity * tariffs.exportTaxRate;
-    const revenue = price * quantity;
-    const afterTax = revenue - exportTax;
-    const profit = afterTax - totalPaid;
-    const profitColor = profit >= 0 ? "text-success" : "text-danger";
-    const profitLabel = profit >= 0 ? "Profit" : "Loss";
+        if (allowedBatches.length === 0) continue; // Nothing can be sold
 
-    if (quantity > 0 && price > 0) {
-      player.inventory[resource] = []; // Clear inventory
-      totalRevenue += afterTax;
+        // Calculate totals for allowed batches
+        let quantity = 0;
+        let totalPaid = 0;
+        allowedBatches.forEach(([qty, paid]) => {
+            quantity += qty;
+            totalPaid += qty * paid;
+        });
 
-      // 🧾 Add NPC-style log
-      tradeTimestamps.push(Date.now());
-      logMarket(
-        `<span class="text-warning">ΛTLΛS | ΞQUINOX™</span> sold ${quantity}${UNIT} of ${resource} in ${location} |
-          <span class="text-info">${price.toFixed(2)}ᶜ</span> each
-          (-Tax: <span class="text-danger">${exportTax.toFixed(2)}ᶜ</span>,
-          <span class="${profitColor}">${profitLabel}: ${profit.toFixed(
-          2
-        )}ᶜ</span>)`
-      );
+        const price = systems[location]?.prices[resource] ?? RESOURCE_DATA[resource]?.base ?? 0;
+        const revenue = price * quantity;
+        const profit = revenue - totalPaid;
+        const profitColor = profit >= 0 ? "text-success" : "text-danger";
+        const profitLabel = profit >= 0 ? "Profit" : "Loss";
 
-      soldItems.push(`${quantity}${UNIT} ${resource}`);
+        // Update inventory: keep only blocked batches
+        player.inventory[resource] = blockedBatches;
+
+        // Add to total revenue
+        totalRevenue += revenue;
+        soldItems.push(`${quantity}${UNIT} ${resource}`);
+
+        // Update market supply and adjust price
+        const market = systems[location].market[resource] || { supply: 0, demand: 0 };
+        market.supply += quantity;
+        systems[location].market[resource] = market;
+
+        const ratio = market.supply === 0 ? 1 : market.demand / market.supply;
+        const base = RESOURCE_DATA[resource].base;
+        systems[location].prices[resource] = parseFloat(
+            Math.max(base * 0.5, Math.min(base * 3, price * (ratio > 1 ? 1 + (ratio - 1) * 0.01 : 1 - (1 - ratio) * 0.01))).toFixed(2)
+        );
+
+        // Log the sale
+        logMarket(
+            `<span class="text-warning">ΛTLΛS | ΞQUINOX™</span> sold ${quantity}${UNIT} of ${resource} in ${location} |
+            <span class="text-info">${price.toFixed(2)}ᶜ</span> each
+            (<span class="${profitColor}">${profitLabel}: ${profit.toFixed(2)}ᶜ</span>)`
+        );
     }
-  }
 
-  if (totalRevenue > 0) {
-    player.credits += totalRevenue;
-    log(
-      `Sold all materials for ${totalRevenue.toFixed(2)}ᶜ: ${soldItems.join(
-        ", "
-      )}`
-    );
-    updateUI();
-  } else {
-    log("No materials to sell.");
-  }
+    if (totalRevenue > 0) {
+        player.credits += totalRevenue;
+        flash("credits");
+        log(`Sold all allowed materials for ${totalRevenue.toFixed(2)}ᶜ: ${soldItems.join(", ")}`);
+        updateUI();
+    } else {
+        log("No materials to sell (or all were purchased in this system).");
+    }
 }
+
 
 function sellAllOfResource(resource) {
   const inv = player.inventory[resource];
   if (!inv || inv.length === 0) return log(`No ${resource} to sell.`);
 
-  let soldQty = 0;
-  let totalPaid = 0;
-  inv.forEach(([qty, price]) => {
-    soldQty += qty;
-    totalPaid += qty * price;
-  });
+  const system = systems[player.location];
+  let market = system.market[resource];
+  let price = system.prices?.[resource] ?? RESOURCE_DATA[resource].base;
 
-  let price = systems[player.location]?.prices[resource];
-  let market = systems[player.location]?.market?.[resource];
-
-  // 🆕 If market is missing, create it
+  // Create market if missing
   if (!market) {
-    log(`ΛΞ started trade of ${res} in ${player.location}.`);
-    const base = RESOURCE_DATA[resource].base;
-    price = base * 1.25;
-    if (!systems[player.location].market) systems[player.location].market = {};
-    if (!systems[player.location].prices) systems[player.location].prices = {};
+    log(`ΛΞ started trade of ${resource} in ${player.location}.`);
+    price = RESOURCE_DATA[resource].base * 1.25;
     market = { supply: 0, demand: 0 };
-    systems[player.location].market[resource] = market;
-    systems[player.location].prices[resource] = price;
-
-    // 🧠 Save new market data
-    const key = `${player.location}-${resource}`;
-    const now = Date.now();
-    const availabilityCache = JSON.parse(
-      localStorage.getItem("atlasMarketAvailability") || "{}"
-    );
-    availabilityCache[key] = { available: true, timestamp: now };
-    localStorage.setItem(
-      "atlasMarketAvailability",
-      JSON.stringify(availabilityCache)
-    );
-
-    const marketDataCache = JSON.parse(
-      localStorage.getItem("atlasMarketData") || "{}"
-    );
-    marketDataCache[key] = { supply: 0, demand: 0 };
-    localStorage.setItem("atlasMarketData", JSON.stringify(marketDataCache));
+    system.market[resource] = market;
+    system.prices[resource] = price;
   }
 
-  const revenue = soldQty * price;
+  // --- Split allowed vs blocked batches ---
+  const allowedBatches = inv.filter(([qty, paid, origin]) => origin !== player.location);
+  const blockedBatches = inv.filter(([qty, paid, origin]) => origin === player.location);
+
+  const blockedQty = blockedBatches.reduce((s, [q]) => s + q, 0);
+  if (blockedQty > 0) {
+    log(
+      `You cannot sell ${blockedQty}${UNIT} of ${resource} in ${player.location} because it was purchased here.`
+    );
+  }
+
+  if (allowedBatches.length === 0) return; // Nothing can be sold
+
+  // --- Sell allowed batches ---
+  let totalSold = 0;
+  let totalPaid = 0;
+
+  allowedBatches.forEach(([qty, paid, origin]) => {
+    totalSold += qty;
+    totalPaid += qty * paid;
+  });
+
+  // Update inventory: keep only blocked batches
+  player.inventory[resource] = blockedBatches;
+
+  const revenue = totalSold * price;
   const profit = revenue - totalPaid;
   const profitColor = profit >= 0 ? "text-success" : "text-danger";
   const profitLabel = profit >= 0 ? "Profit" : "Loss";
 
   player.credits += revenue;
-  player.inventory[resource] = [];
-  market.supply += soldQty;
-
   flash("credits");
-  log(
-    `Sold ${soldQty}${UNIT} of ${resource} at ${price.toFixed(
-      2
-    )}ᶜ each (Total: ${revenue.toFixed(2)}ᶜ)`
+
+  market.supply += totalSold;
+  const ratio = market.supply === 0 ? 1 : market.demand / market.supply;
+  const base = RESOURCE_DATA[resource].base;
+  let newPrice =
+    price * (ratio > 1 ? 1 + (ratio - 1) * 0.01 : 1 - (1 - ratio) * 0.01);
+  system.prices[resource] = parseFloat(
+    Math.max(base * 0.5, Math.min(base * 3, newPrice)).toFixed(2)
   );
-  tradeTimestamps.push(Date.now());
 
   logMarket(
-    `<span class="text-warning">ΛTLΛS | ΞQUINOX™</span> sold  ${soldQty}${UNIT} of ${resource}  |  <span class="text-info">${price.toFixed(
-      2
-    )}ᶜ</span> each (<span class="${profitColor}">${profitLabel}: ${profit.toFixed(
-      2
-    )}ᶜ</span>)`
+    `<span class="text-warning">ΛTLΛS | ΞQUINOX™</span> sold ${totalSold}${UNIT} of ${resource} in ${player.location} |
+      <span class="text-info">${price.toFixed(2)}ᶜ</span> each 
+      (<span class="${profitColor}">${profitLabel}: ${profit.toFixed(2)}ᶜ</span>)`
   );
+
   updateUI();
 }
+
 
 /**
  * Simulate what the new unit price would be
  * if you bought `amount` more at once.
  */
+/**
+ * Simulate what the new unit price would be
+ * if you bought `amount` more at once.
+ */
 function projectPostBuyPrice(location, resource, amount) {
-  const entry = systems[location]?.market?.[resource];
+    const entry = systems[location]?.market?.[resource];
+    const systemData = systems[location];
 
-  // If market is unavailable or has no supply, fallback to seeded price
-  if (!entry || entry.supply === 0) {
-    const fallback = systems[location]?.prices?.[resource] ?? getTimeSeededPrice(location, resource);
-    return parseFloat(fallback.toFixed(2));
-  }
+    // If market is unavailable or has no supply, fallback to seeded price
+    if (!entry || entry.supply === 0) {
+        const fallback = systemData?.prices?.[resource] ?? getTimeSeededPrice(location, resource);
+        return parseFloat(fallback.toFixed(2));
+    }
 
-  // Get base price using time seed
-  const timePrice = getTimeSeededPrice(location, resource);
+    // Get the current price from the system data (which should be the seeded price + market factors)
+    const currentPrice = systemData.prices[resource]; 
 
-  // Apply scarcity multiplier
-  const totalSys = SYSTEM_NAMES.length;
-  const avail = SYSTEM_NAMES.filter(sys => systems[sys].market?.[resource]).length;
-  const scarcity = 1 + ((totalSys - avail) / totalSys) * 0.3;
-  const rawBase = timePrice * scarcity;
+    // 1. Calculate the 'Base' price (Time-seeded price + Scarcity)
+    const timePrice = getTimeSeededPrice(location, resource);
+    const totalSys = SYSTEM_NAMES.length;
+    const avail = SYSTEM_NAMES.filter(sys => systems[sys].market?.[resource]).length;
+    const scarcity = 1 + ((totalSys - avail) / totalSys) * 0.3;
+    const rawBase = timePrice * scarcity;
 
-  // Simulate price change based on increased demand
-  const newDemand = entry.demand + amount;
-  const ratio = newDemand / entry.supply;
-  let impacted = rawBase * (ratio > 1
-    ? 1 + (ratio - 1) * 0.01
-    : 1 - (1 - ratio) * 0.01);
+    // 2. Calculate Market Pressure: Ratio of (Demand + Player Buy) / Supply
+    const newDemand = entry.demand + amount;
+    const ratio = newDemand / entry.supply;
+    
+    // 3. Determine the Impact Factor
+    // Base impact is 0.01 (1% deviation per ratio unit)
+    let impactFactor = 0.01; 
+    
+    // 💥 NEW: Amplify impact based on trade volume vs market size.
+    // TARIFF_SETTINGS.maxMarketSize (e.g., 5000 units) should be defined externally.
+    const playerVolumeRatio = amount / (entry.supply + entry.demand + 1000); // Compare to total volume
+    
+    // If the player's trade exceeds 10% of the current market size, start applying heavy penalty
+    if (playerVolumeRatio > 0.1) {
+        // Use a quadratic or high exponent curve for punishing large trades.
+        impactFactor = 0.01 + 0.1 * (playerVolumeRatio ** 2); // E.g., 0.1% base + 10% * (ratio^2)
+        impactFactor = Math.min(0.5, impactFactor); // Cap max impact at 50%
+    }
+    
+    // 4. Calculate the Final Impacted Price
+    let impacted = rawBase * (ratio > 1
+        ? 1 + (ratio - 1) * impactFactor // Increased impact factor
+        : 1 - (1 - ratio) * 0.01); // Normal dampening for sell side (not player sell here)
 
-  // Clamp final price
-  const base = RESOURCE_DATA[resource].base;
-  impacted = Math.max(base * 0.5, Math.min(base * 3, impacted));
+    // Clamp final price
+    const base = RESOURCE_DATA[resource].base;
+    impacted = Math.max(base * 0.5, Math.min(base * 3, impacted));
 
-  return parseFloat(impacted.toFixed(2));
+    return parseFloat(impacted.toFixed(2));
 }
 
-function updateBuyBreakdown(res, amt) {
+function updateBuyBreakdown(res, amt, price = undefined, taxRate = undefined) {
   if (!amt || !RESOURCE_DATA[res]) {
     document.getElementById("buybreakdown").textContent = "~";
     return;
@@ -437,16 +495,15 @@ function updateBuyBreakdown(res, amt) {
     return; // ⛔ Prevent crash during warp
   }
 
-  const unitPrice = projectPostBuyPrice(loc, res, amt);
-  const taxRate = sys.tariffs?.importTaxRate || 0;
-  const tax = unitPrice * amt * taxRate;
+  // Use provided price and taxRate if available, otherwise calculate
+  const unitPrice = price !== undefined ? price : projectPostBuyPrice(loc, res, amt);
+  const effectiveTaxRate = taxRate !== undefined ? taxRate : sys.tariffs?.importTaxRate || 0;
+  const tax = unitPrice * amt * effectiveTaxRate;
   const total = unitPrice * amt + tax;
 
   document.getElementById("buybreakdown").textContent =
     `${total.toFixed(2)}ᶜ`;
 }
-
-
 
 
 function buyMaterial() {
@@ -489,7 +546,7 @@ function buyMaterial() {
   }
   // — now we know they can pay, so on to the real trade
 
-  pendingTrade = () => {
+  pendingTrade = function() {
     // Deduct credits & queue shipment
     player.credits -= totalCost;
     player.shipments.push({
@@ -497,13 +554,14 @@ function buyMaterial() {
       resource: res,
       amount:   amt,
       price:    buyPrice,
+      originSystem: player.location,
       time:     Date.now() + getRandomShipmentDelay(),
     });
 
     recentPlayerBuys[`${player.location}-${res}`] = Date.now();
+    const projectedPrice = projectPostBuyPrice(player.location, res, amt);
     market.demand += amt;
-    const newP = projectPostBuyPrice(player.location, res, amt);
-    systems[player.location].prices[res] = newP;
+    systems[player.location].prices[res] = projectedPrice;
 
     flash("credits");
     updateUI();
@@ -513,90 +571,78 @@ function buyMaterial() {
   showTradeSummary("buy", res, amt, buyPrice);
 }
 
-
-
 function sellMaterial() {
-  const res = document.getElementById("tradeResourceSelect").value;
-  const amt = parseInt(document.getElementById("tradeAmount").value, 10);
-  if (!amt || amt <= 0) return log("Invalid quantity.");
+    const res = document.getElementById("tradeResourceSelect").value;
+    const amt = parseInt(document.getElementById("tradeAmount").value, 10);
+    if (!amt || amt <= 0) return log("Invalid quantity.");
+    if (!RESOURCE_DATA[res]) return log(`Unknown resource: ${res}`);
 
+    const system = systems[player.location];
+    let market = system.market[res];
+    let price = system.prices?.[res] ?? RESOURCE_DATA[res].base;
 
-
-
-  if (!RESOURCE_DATA[res]) {
-    return log(`Unknown resource: ${res}`);
-  }
-
-  const system = systems[player.location];
-  let market = system.market[res];
-  let price = system.prices?.[res] ?? RESOURCE_DATA[res].base;
-
-  // If market doesn’t exist, create it
-  if (!market) {
-    log(`ΛΞ started trade of ${res} in ${player.location}.`);
-    price = RESOURCE_DATA[res].base * 1.25;
-    market = { supply: 0, demand: 0 };
-    system.market[res] = market;
-    system.prices[res] = price;
-
-    const key = `${player.location}-${res}`;
-    const now = Date.now();
-    const ac = JSON.parse(localStorage.getItem("atlasMarketAvailability") || "{}");
-    ac[key] = { available: true, timestamp: now };
-    localStorage.setItem("atlasMarketAvailability", JSON.stringify(ac));
-
-    const md = JSON.parse(localStorage.getItem("atlasMarketData") || "{}");
-    md[key] = { supply: 0, demand: 0 };
-    localStorage.setItem("atlasMarketData", JSON.stringify(md));
-  }
-
-  const inv = player.inventory[res] || [];
-  const inventoryAmount = inv.reduce((sum, [qty]) => sum + qty, 0);
-  if (inventoryAmount === 0) return log("No inventory to sell.");
-
-  const sellAmt = Math.min(amt, inventoryAmount);
-
-  const lastBuyTime = recentPlayerBuys[`${player.location}-${res}`];
-  if (lastBuyTime && Date.now() - lastBuyTime < TRADE_COOLDOWN) {
-    const wait = Math.ceil((TRADE_COOLDOWN - (Date.now() - lastBuyTime)) / 1000);
-    return log(`${res} trading in ${player.location} is restricted. Wait ${wait}s.`);
-  }
-
-  // Show breakdown before confirmation
-
-
-  pendingTrade = () => {
-    let toSell = sellAmt, sold = 0, totalPaid = 0;
-    for (let i = 0; i < inv.length && toSell > 0; i++) {
-      const [qty, paid] = inv[i];
-      const take = Math.min(qty, toSell);
-      totalPaid += take * paid;
-      sold += take;
-      inv[i][0] -= take;
-      toSell -= take;
+    if (!market) {
+        log(`ΛΞ started trade of ${res} in ${player.location}.`);
+        price = RESOURCE_DATA[res].base * 1.25;
+        market = { supply: 0, demand: 0 };
+        system.market[res] = market;
+        system.prices[res] = price;
     }
-    player.inventory[res] = inv.filter(([q]) => q > 0);
 
-    const revenue = sold * price;
+    const inv = player.inventory[res] || [];
+    if (!inv.length) return log(`No ${res} to sell.`);
+
+    // Filter out goods bought in this system
+    const allowedInventory = inv.filter(([qty, paid, origin]) => origin !== player.location);
+    const blockedQty = inv.filter(([qty, paid, origin]) => origin === player.location)
+                          .reduce((s, [qty]) => s + qty, 0);
+
+    if (blockedQty > 0) {
+        log(`You cannot sell ${blockedQty}${UNIT} of ${res} in ${player.location} because it was purchased here.`);
+    }
+
+    if (!allowedInventory.length) return; // Nothing can be sold
+
+    const totalAllowed = allowedInventory.reduce((s, [qty]) => s + qty, 0);
+    const sellAmt = Math.min(amt, totalAllowed);
+
+    // Execute sale
+    let toSell = sellAmt;
+    let totalPaid = 0;
+    for (let batch of allowedInventory) {
+        const [qty, paid] = batch;
+        const take = Math.min(qty, toSell);
+        batch[0] -= take;
+        totalPaid += take * paid;
+        toSell -= take;
+        if (toSell <= 0) break;
+    }
+
+    // Rebuild inventory
+    player.inventory[res] = [
+        ...allowedInventory.filter(([qty]) => qty > 0),
+        ...inv.filter(([qty, paid, origin]) => origin === player.location)
+    ];
+
+    const revenue = sellAmt * price;
     player.credits += revenue;
     flash("credits");
 
-    market.supply += sold;
-    const ratio = market.demand / market.supply;
+    market.supply += sellAmt;
+    const ratio = market.supply === 0 ? 1 : market.demand / market.supply;
     const base = RESOURCE_DATA[res].base;
-    let newPrice =
-      price * (ratio > 1
-        ? 1 + (ratio - 1) * 0.01
-        : 1 - (1 - ratio) * 0.01);
     system.prices[res] = parseFloat(
-      Math.max(base * 0.5, Math.min(base * 3, newPrice)).toFixed(2)
+        Math.max(base * 0.5, Math.min(base * 3, price * (ratio > 1 ? 1 + (ratio - 1) * 0.01 : 1 - (1 - ratio) * 0.01))).toFixed(2)
+    );
+
+    logMarket(
+        `<span class="text-warning">ΛTLΛS | ΞQUINOX™</span> sold ${sellAmt}${UNIT} of ${res} in ${player.location} |
+        <span class="text-info">${price.toFixed(2)}ᶜ</span>`
     );
 
     updateUI();
-  };
-
-  showTradeSummary("sell", res, sellAmt, price);
 }
+
 
 
 function showTradeSummary(type, res, amt, price) {

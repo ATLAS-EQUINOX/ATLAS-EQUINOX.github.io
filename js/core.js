@@ -19,7 +19,7 @@ const TRADE_COOLDOWN = 10000; // 10 seconds cooldown to prevent resell exploits
 const TARIFF_CACHE_KEY = "atlasTariffCache";
 
 let corporations = {};
-window.activeContracts = [];
+window.acceptedContracts = [];
 const UNIT = "ᵣ";
 let expandedResources = {};
 const npcLastTradeTime = {};
@@ -114,7 +114,7 @@ function initGame() {
   window.addEventListener("DOMContentLoaded", () => {
     loadContracts();
     renderAvailableContracts();
-    renderActiveContracts();
+    renderacceptedContracts();
   });
 
 
@@ -288,7 +288,7 @@ function tick() {
   updateGameAgeDisplay();
   renderAvailableContracts();
   checkContractTimers();
-  renderActiveContracts(); // Optional, if you just want to update UI
+  renderacceptedContracts(); // Optional, if you just want to update UI
   // OR
   checkContractTimers(); // If you're checking for expiry
   // OR
@@ -304,7 +304,7 @@ function tick() {
 
 
   setInterval(() => {
-    renderActiveContracts();
+    renderacceptedContracts();
     checkContractTimers(); // to expire them
   }, 1000);
 
@@ -378,7 +378,7 @@ window.onload = function () {
     .getElementById("travelSearch")
     .addEventListener("change", toggleTravelButton);
   saveGameState(false);
-  for (let i = 1; i < 4; i++) generateContract();
+  for (let i = 1; i < 10; i++) generateContract();
   renderAvailableContracts();
   setTimeout(hideLoadingOverlay, 1000);
 

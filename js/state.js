@@ -6,7 +6,7 @@ let gameStartTime;
 let playerHighScore = 100;
 let player = {
   location: SYSTEM_NAMES[Math.floor(Math.random() * SYSTEM_NAMES.length)],
-  credits: 200,
+  credits: 500,
   fuel: 853,
   inventory: {},
   vault: {},
@@ -123,16 +123,16 @@ function loadGameState() {
 
 
 function saveContracts() {
-  localStorage.setItem("activeContracts", JSON.stringify(activeContracts));
+  localStorage.setItem("acceptedContracts", JSON.stringify(acceptedContracts));
 }
 
 function loadContracts() {
-  const data = localStorage.getItem("activeContracts");
+  const data = localStorage.getItem("acceptedContracts");
   if (data) {
-    activeContracts = JSON.parse(data);
+    acceptedContracts = JSON.parse(data);
 
     // Restore Date objects and defaults
-    activeContracts.forEach(c => {
+    acceptedContracts.forEach(c => {
       if (!c.issuedAt && c.status === "accepted") c.issuedAt = Date.now();
     });
   }
@@ -156,17 +156,25 @@ function resetGameState() {
 
 function refuel() {
   const fuelPrice = systems[player.location].prices["Fuel"];
-  if (player.fuel >= FUEL_CAPACITY)
+  if (player.fuel >= FUEL_CAPACITY) {
     return log("Your fuel tank is already full.");
-  if (player.credits < fuelPrice)
+  }
+  if (player.credits < fuelPrice) {
     return log("You don't have enough credits to buy fuel.");
+  }
 
-  player.fuel += 1;
-  player.credits -= fuelPrice;
+  // Calculate maximum fuel that can be bought
+  const maxAffordable = Math.floor(player.credits / fuelPrice);
+  const maxFillable = FUEL_CAPACITY - player.fuel;
+  const fuelToBuy = Math.min(maxAffordable, maxFillable);
+
+  // Update player
+  player.fuel += fuelToBuy;
+  player.credits -= fuelToBuy * fuelPrice;
 
   flash("fuel");
   flash("credits");
-  log(`Refueled 1 unit at ${fuelPrice.toFixed(2)}ᶜ.`);
+  log(`Refueled ${fuelToBuy} unit${fuelToBuy > 1 ? "s" : ""} at ${fuelPrice.toFixed(2)}ᶜ each.`);
   updateUI();
 }
 

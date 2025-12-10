@@ -275,7 +275,12 @@ button {
 
 section.console-wrapper h5 span.text-success {
     margin-left: 8px;
-    font-weight: 400
+    font-weight: 400;
+    color: #ffc107
+}
+
+.text-success {
+    color: #ffc107
 }
 
 .sidebar {
@@ -764,7 +769,7 @@ body.modal-open {
     background-color: #111;
     border-bottom: 1px solid #333;
     margin-bottom: .5rem;
-    border-radius: 10px
+
 }
 
 .custom-tab {
@@ -809,7 +814,7 @@ body.modal-open {
 .nav-tabs .nav-link.active {
     color: #000000;
     background-color: #222;
-    border-bottom: 2px solid #ffc107
+    border-bottom: 2px solid #07ff28
 }
 
 .panel-section {
