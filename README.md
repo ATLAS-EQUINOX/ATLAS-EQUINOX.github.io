@@ -9,38 +9,6 @@
 The idea started as a small experiment and gradually grew into a much larger economic simulation involving trading, supply and demand, interstellar logistics, contracts, corporations, taxation, stocks, and a whole lot of questionable corporate decisions.
 
 This isn't a full-time project or a polished commercial release. It's something I build whenever I have the time, usually because I've thought of another mechanic that would be fun to try.
-
----
-
-## 🚀 What is it?
-
-The basic idea is simple:
-
-**Buy low → transport → sell high → reinvest → repeat**
-
-You operate across a network of star systems, each with its own economy and specialisations. Resources move, prices change, corporations compete, and seemingly profitable trades can disappear once fuel costs, tariffs and logistics are taken into account.
-
-The goal?
-
-**Make money.**
-
-Preferably before the corporation notices how much you've been spending.
-
-### Current features
-
-* Dynamic supply & demand economy
-* Multiple star systems with specialised economies
-* Interstellar travel and fuel costs
-* Delayed cargo shipments
-* Storage / vault system
-* Trading contracts
-* NPC corporations
-* Stock market
-* Import & export taxation
-* Market intelligence and information distance
-* Persistent game state
-* And plenty of systems still being experimented with
-
 ---
 
 # 🛠️ The Development Journey
